@@ -1,0 +1,146 @@
+@import "./variables.css";
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 200, 49, 0.3);
+  border-radius: 14px;
+  padding: 32px;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 0 32px rgba(255, 200, 49, 0.1);
+}
+
+.modal-title {
+  color: var(--accent-primary);
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.modal-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 0.95rem;
+}
+
+.modal-label {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.modal-row span:last-child {
+  color: var(--text-primary);
+  text-align: right;
+}
+
+.modal-close {
+  margin-top: 8px;
+  background: transparent;
+  border: 1px solid rgba(255, 200, 49, 0.4);
+  color: var(--accent-primary);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+  align-self: flex-end;
+}
+
+.modal-close:hover {
+  background: rgba(255, 200, 49, 0.08);
+}
+
+/* texto de ayuda debajo de los campos */
+.modal-hint {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  margin: 0;
+  font-style: italic;
+}
+
+/* mensaje de error dentro del modal */
+.modal-error {
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* fila de botones al pie del modal (confirmar / cancelar) */
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+/* input de fecha y select de horario dentro de los modales */
+.modal-date-input {
+  background: #2a2a2a;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+  padding: 6px 10px;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  flex: 1;
+  min-width: 0;
+  color-scheme: dark;
+}
+
+.modal-date-input:focus {
+  outline: none;
+  border-color: rgba(255, 200, 49, 0.4);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 540px) {
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-card {
+    min-width: unset;
+    width: 100%;
+    border-radius: 18px 18px 0 0;
+    padding: 24px 18px 36px;
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+
+  .modal-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .modal-row span:last-child {
+    text-align: left;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .modal-actions button,
+  .modal-close {
+    width: 100%;
+    text-align: center;
+    align-self: stretch;
+    justify-content: center;
+  }
+}
