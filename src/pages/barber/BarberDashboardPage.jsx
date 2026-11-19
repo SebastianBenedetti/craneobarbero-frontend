@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { getBarberAppointmentsService } from "./barber.services";
-import { cancelAppointmentService } from "../../services/appointments.services";
+import { getStaffAppointments } from "../../services/appointments.services";
 import AppointmentModal from "../../components/AppointmentModal/AppointmentModal";
 import AppointmentEditModal from "../../components/AppointmentEditModal/AppointmentEditModal";
-import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
+import CancelAppointmentModal from "../../components/CancelAppointmentModal/CancelAppointmentModal";
+import NewAppointmentModal from "../../components/NewAppointmentModal/NewAppointmentModal";
+import AppointmentStatusBadge from "../../components/AppointmentStatusBadge/AppointmentStatusBadge";
 import "../../styles/barberDashboard.css";
 import "../../styles/appointmentModal.css";
 
@@ -14,45 +15,37 @@ function BarberDashboardPage() {
   const [appointments, setAppointments] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null); // para el modal de detalle
   const [editingAppointment, setEditingAppointment] = useState(null);   // para el modal de editar
-  const [cancelingId, setCancelingId] = useState(null);                  // id del turno a cancelar
+  const [cancelingAppointment, setCancelingAppointment] = useState(null); // turno a cancelar
+  const [creating, setCreating] = useState(false);                         // modal de turno nuevo
 
-  // cuando confirma la cancelacion en el modal hacemos el request y actualizamos el estado local
-  const handleConfirmCancel = () => {
-    cancelAppointmentService(
-      cancelingId,
-      () => {
-        // actualizamos solo el turno cancelado sin recargar toda la lista
-        setAppointments((prev) =>
-          prev.map((a) =>
-            a.id === cancelingId ? { ...a, status: "cancelled" } : a,
-          ),
-        );
-        setCancelingId(null);
-      },
-      () => setCancelingId(null),
-    );
-  };
+  // actualizamos solo el turno modificado sin recargar toda la lista
+  const replace = (updated) =>
+    setAppointments((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
 
   useEffect(() => {
     document.title = " Inicio | Cráneo Barbero";
   }, []);
 
   // cargamos los turnos del barbero al montar el componente
-  useEffect(() => {
-    getBarberAppointmentsService(
-      (data) => setAppointments(data),
-      () => setAppointments([]),
-    );
+  const loadAppointments = useCallback(() => {
+    getStaffAppointments()
+      .then(setAppointments)
+      .catch(() => setAppointments([]));
   }, []);
+
+  useEffect(() => {
+    loadAppointments();
+  }, [loadAppointments]);
 
   const now = new Date();
   const today = now.toDateString(); // convertimos a string sin hora para comparar solo el dia
 
-  // filtramos los turnos que son de hoy
+  // filtramos los turnos que son de hoy (sin cancelados ni vencidos)
+  const counts = (appointment) => ["pending", "completed", "awaiting_payment"].includes(appointment.status);
   const todayAppointments = appointments.filter(
     (appointment) =>
       new Date(appointment.appointmentDate).toDateString() === today &&
-      appointment.status !== "cancelled",
+      counts(appointment),
   );
 
   // cuantos turnos de hoy ya estan completados
@@ -118,7 +111,7 @@ function BarberDashboardPage() {
       .filter(
         (appointment) =>
           new Date(appointment.appointmentDate).toDateString() ===
-            day.toDateString() && appointment.status !== "cancelled",
+            day.toDateString() && counts(appointment),
       )
       .sort(
         (a, b) => new Date(a.appointmentDate) - new Date(b.appointmentDate),
@@ -171,7 +164,7 @@ function BarberDashboardPage() {
             </div>
             <div className="next-info">
               <span className="next-client">
-                {nextAppointment.client?.name}
+                {nextAppointment.client?.name || nextAppointment.clientName}
               </span>
               <span className="next-service">{nextAppointment.cut?.name}</span>
             </div>
@@ -184,7 +177,10 @@ function BarberDashboardPage() {
 
       {/* agenda con todos los dias que tienen turnos, uno por fila */}
       <section className="barber-agenda">
-        <h2 className="section-title">Agenda de la semana</h2>
+        <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <h2 className="section-title">Agenda de la semana</h2>
+          <button className="btn-agenda-edit" onClick={() => setCreating(true)}>+ Nuevo turno</button>
+        </div>
         {futureDays.map((day) => {
           const dayAppointments = appointmentsForDay(day);
           return (
@@ -218,16 +214,17 @@ function BarberDashboardPage() {
                         className="agenda-client"
                         onClick={() => setSelectedAppointment(appointment)}
                       >
-                        {appointment.client?.name}
+                        {appointment.client?.name || appointment.clientName}
                       </span>
 
                       <span className="agenda-service">
                         {appointment.cut?.name}
                       </span>
 
-                      {/* los botones de modificar y cancelar solo aparecen si el turno no paso */}
+                      {/* los botones de modificar y cancelar solo aparecen si el turno no paso y esta confirmado */}
                       <div className="agenda-actions">
-                        {!isPassedAppointment && (
+                        <AppointmentStatusBadge appointment={appointment} />
+                        {!isPassedAppointment && appointment.status === "pending" && (
                           <>
                             <button
                               className="btn-agenda-edit"
@@ -237,7 +234,7 @@ function BarberDashboardPage() {
                             </button>
                             <button
                               className="btn-agenda-cancel"
-                              onClick={() => setCancelingId(appointment.id)}
+                              onClick={() => setCancelingAppointment(appointment)}
                             >
                               Cancelar
                             </button>
@@ -263,27 +260,38 @@ function BarberDashboardPage() {
       {editingAppointment && (
         <AppointmentEditModal
           appointment={editingAppointment}
+          staff
           onClose={() => setEditingAppointment(null)}
-          onSaved={(updatedId, newDate) => {
-            // actualizamos solo la fecha del turno editado en el estado local
-            setAppointments((prev) =>
-              prev.map((a) =>
-                a.id === updatedId ? { ...a, appointmentDate: newDate } : a,
-              ),
-            );
+          onSaved={(updated) => {
+            // actualizamos el turno editado en el estado local
+            replace(updated);
             setEditingAppointment(null);
           }}
         />
       )}
 
-      {/* modal de confirmacion antes de cancelar un turno */}
-      {cancelingId && (
-        <ConfirmModal
-          title="Cancelar turno"
-          message="¿Estás seguro que querés cancelar este turno? El cliente podrá volver a sacarlo."
-          confirmLabel="Sí, cancelar"
-          onConfirm={handleConfirmCancel}
-          onCancel={() => setCancelingId(null)}
+      {/* modal de cancelacion con el aviso de reembolso antes de confirmar */}
+      {cancelingAppointment && (
+        <CancelAppointmentModal
+          appointment={cancelingAppointment}
+          askReason
+          onClose={() => setCancelingAppointment(null)}
+          onCancelled={(updated) => {
+            replace(updated);
+            setCancelingAppointment(null);
+          }}
+        />
+      )}
+
+      {/* modal para cargar un turno manual */}
+      {creating && (
+        <NewAppointmentModal
+          fixedBarber={{ id: user.id, name: user.name }}
+          onClose={() => setCreating(false)}
+          onCreated={() => {
+            setCreating(false);
+            loadAppointments();
+          }}
         />
       )}
     </div>

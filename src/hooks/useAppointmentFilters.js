@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 // lo usamos en la agenda del barber y en el panel admin
 // recibe el array de turnos y devuelve todo lo necesario para filtrar y paginar
 function useAppointmentFilters(appointments) {
-  // filtro activo por estado, puede ser "all", "pending", "completed" o "cancelled"
+  // filtro activo por estado, puede ser "all", "awaiting_payment", "pending", "completed", "cancelled" o "expired"
   const [activeFilter, setActiveFilter] = useState("all");
 
   // rango de fechas, si están vacíos no se aplica el filtro de fechas
@@ -30,11 +30,8 @@ function useAppointmentFilters(appointments) {
 
   // filtramos por estado
   const filteredByStatus = appointments.filter((a) => {
-    if (activeFilter === "pending")
-      return a.status === "pending" || a.status === "confirmed";
-    if (activeFilter === "completed") return a.status === "completed";
-    if (activeFilter === "cancelled") return a.status === "cancelled";
-    return true; // "all" muestra todo
+    if (activeFilter === "all") return true; // "all" muestra todo
+    return a.status === activeFilter;
   });
 
   // después filtramos por rango de fechas, barbero y sucursal, y ordenamos
@@ -55,8 +52,8 @@ function useAppointmentFilters(appointments) {
       }
       // si hay un barbero seleccionado, filtramos por él
       if (filterBarberId && String(a.barber?.id) !== String(filterBarberId)) return false;
-      // si hay una sucursal seleccionada, la comparamos con la sucursal del barbero del turno
-      if (filterBranchId && String(a.barber?.branchId) !== String(filterBranchId)) return false;
+      // si hay una sucursal seleccionada, la comparamos con la sucursal del turno
+      if (filterBranchId && String(a.branch?.id) !== String(filterBranchId)) return false;
       return true;
     })
     .sort((a, b) => new Date(a.appointmentDate) - new Date(b.appointmentDate));

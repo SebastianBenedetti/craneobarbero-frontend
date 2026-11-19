@@ -1,16 +1,20 @@
-import { useState, useEffect } from "react";
-import { getBarberAppointmentsService } from "./barber.services";
-import { cancelAppointmentService } from "../../services/appointments.services";
+import { useState, useEffect, useCallback } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { getStaffAppointments } from "../../services/appointments.services";
 import useAppointmentFilters from "../../hooks/useAppointmentFilters";
 import AppointmentModal from "../../components/AppointmentModal/AppointmentModal";
 import AppointmentEditModal from "../../components/AppointmentEditModal/AppointmentEditModal";
-import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
+import CancelAppointmentModal from "../../components/CancelAppointmentModal/CancelAppointmentModal";
+import NewAppointmentModal from "../../components/NewAppointmentModal/NewAppointmentModal";
+import AppointmentStatusBadge from "../../components/AppointmentStatusBadge/AppointmentStatusBadge";
 import PaginationControls from "../../components/PaginationControls/PaginationControls";
 import "../../styles/barberDashboard.css";
 import "../../styles/barberSchedule.css";
 import "../../styles/appointmentModal.css";
 
 function BarberSchedulePage() {
+  const { user } = useAuth();
+
   // los turnos que vienen del servidor
   const [appointments, setAppointments] = useState([]);
 
@@ -21,7 +25,10 @@ function BarberSchedulePage() {
   const [editingAppointment, setEditingAppointment] = useState(null);
 
   // turno seleccionado para cancelar, lo usamos para el modal de confirmación
-  const [cancelingId, setCancelingId] = useState(null);
+  const [cancelingAppointment, setCancelingAppointment] = useState(null);
+
+  // controla el modal para cargar un turno nuevo
+  const [creating, setCreating] = useState(false);
 
   // controla si el modal del selector de fechas está abierto
   const [showDateModal, setShowDateModal] = useState(false);
@@ -40,30 +47,19 @@ function BarberSchedulePage() {
     document.title = " Mi agenda | Cráneo Barbero";
   }, []);
 
-  useEffect(() => {
-    // cuando carga la página traemos todos los turnos del barber
-    getBarberAppointmentsService(
-      (data) => setAppointments(data),
-      () => setAppointments([]),
-    );
+  // cuando carga la página traemos todos los turnos del barber
+  const loadAppointments = useCallback(() => {
+    getStaffAppointments()
+      .then(setAppointments)
+      .catch(() => setAppointments([]));
   }, []);
 
-  // cuando el usuario confirma la cancelación en el modal
-  const handleConfirmCancel = () => {
-    cancelAppointmentService(
-      cancelingId,
-      () => {
-        // actualizamos el estado local marcando el turno como cancelado
-        setAppointments((prev) =>
-          prev.map((a) =>
-            a.id === cancelingId ? { ...a, status: "cancelled" } : a,
-          ),
-        );
-        setCancelingId(null);
-      },
-      () => setCancelingId(null),
-    );
-  };
+  useEffect(() => {
+    loadAppointments();
+  }, [loadAppointments]);
+
+  const replace = (updated) =>
+    setAppointments((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
 
   const now = new Date();
 
@@ -91,6 +87,7 @@ function BarberSchedulePage() {
         {[
           { key: "all", label: "Todos" },
           { key: "pending", label: "Por atender" },
+          { key: "awaiting_payment", label: "Esperando pago" },
           { key: "completed", label: "Ya atendidos" },
           { key: "cancelled", label: "Cancelados" },
         ].map((f) => (
@@ -111,6 +108,10 @@ function BarberSchedulePage() {
           {dateFrom || dateTo
             ? `${dateFrom || "..."} → ${dateTo || "..."}`
             : "Seleccionar rango de días"}
+        </button>
+
+        <button className="btn-filter btn-filter-active" onClick={() => setCreating(true)}>
+          + Nuevo turno
         </button>
 
         {/* si hay rango activo mostramos botón para limpiarlo */}
@@ -180,7 +181,7 @@ function BarberSchedulePage() {
         ) : (
           paginated.map((appointment) => {
             const isPassedAppointment = isPast(appointment.appointmentDate);
-            const isCancelled = appointment.status === "cancelled";
+            const isCancelled = !["pending", "awaiting_payment"].includes(appointment.status);
             return (
               <div
                 key={appointment.id}
@@ -198,20 +199,18 @@ function BarberSchedulePage() {
                   className="agenda-client"
                   onClick={() => setSelectedAppointment(appointment)}
                 >
-                  {appointment.client?.name}
+                  {appointment.client?.name || appointment.clientName || "—"}
                 </span>
 
                 <span className="agenda-service">
-                  {appointment.cut?.name || appointment.Cut?.name || "—"}
+                  {appointment.cut?.name || "—"}
                 </span>
 
                 <div className="agenda-actions">
-                  {/* badge de cancelado al final de la fila */}
-                  {isCancelled && (
-                    <span className="badge bg-danger ms-auto">CANCELADO</span>
-                  )}
-                  {/* botones solo si el turno no pasó y no está cancelado */}
-                  {!isPassedAppointment && !isCancelled && (
+                  {/* estado del turno y del pago al final de la fila */}
+                  <AppointmentStatusBadge appointment={appointment} />
+                  {/* botones solo si el turno no pasó y está confirmado (los que esperan pago los cancela el cliente o el admin) */}
+                  {!isPassedAppointment && appointment.status === "pending" && (
                     <>
                       <button
                         className="btn-agenda-edit"
@@ -221,7 +220,7 @@ function BarberSchedulePage() {
                       </button>
                       <button
                         className="btn-agenda-cancel"
-                        onClick={() => setCancelingId(appointment.id)}
+                        onClick={() => setCancelingAppointment(appointment)}
                       >
                         Cancelar
                       </button>
@@ -254,27 +253,38 @@ function BarberSchedulePage() {
       {editingAppointment && (
         <AppointmentEditModal
           appointment={editingAppointment}
+          staff
           onClose={() => setEditingAppointment(null)}
-          onSaved={(updatedId, newDate) => {
-            // actualizamos la fecha del turno en el array local sin recargar
-            setAppointments((prev) =>
-              prev.map((a) =>
-                a.id === updatedId ? { ...a, appointmentDate: newDate } : a,
-              ),
-            );
+          onSaved={(updated) => {
+            // actualizamos el turno en el array local sin recargar
+            replace(updated);
             setEditingAppointment(null);
           }}
         />
       )}
 
-      {/* modal de confirmación antes de cancelar un turno */}
-      {cancelingId && (
-        <ConfirmModal
-          title="Cancelar turno"
-          message="¿Estás seguro que querés cancelar este turno? El cliente podrá volver a sacarlo."
-          confirmLabel="Sí, cancelar"
-          onConfirm={handleConfirmCancel}
-          onCancel={() => setCancelingId(null)}
+      {/* modal de cancelación con el aviso de reembolso antes de confirmar */}
+      {cancelingAppointment && (
+        <CancelAppointmentModal
+          appointment={cancelingAppointment}
+          askReason
+          onClose={() => setCancelingAppointment(null)}
+          onCancelled={(updated) => {
+            replace(updated);
+            setCancelingAppointment(null);
+          }}
+        />
+      )}
+
+      {/* modal para cargar un turno manual */}
+      {creating && (
+        <NewAppointmentModal
+          fixedBarber={{ id: user.id, name: user.name }}
+          onClose={() => setCreating(false)}
+          onCreated={() => {
+            setCreating(false);
+            loadAppointments();
+          }}
         />
       )}
 
