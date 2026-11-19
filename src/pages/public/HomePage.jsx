@@ -2,13 +2,22 @@ import "../../styles/home.css";
 import "../../styles/animations.css";
 
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
+import { useAuth } from "../../context/AuthContext";
+
+const PANEL_BY_ROLE = { admin: "/admin", barber: "/barber" };
 
 function HomePage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   useEffect(() => {
     document.title = " Inicio | Cráneo Barbero";
   }, []);
+
+  const panel = PANEL_BY_ROLE[user?.role];
+  if (panel) {
+    return <Navigate to={panel} replace />;
+  }
 
   return (
     <div className="home-container page-transition">
