@@ -3,12 +3,13 @@ import {
   getAllCutsAdminService,
   createCutAdminService,
   updateCutAdminService,
-  deleteCutAdminService,
+  setCutActiveAdminService,
 } from "../../../services/admin.services";
 import PaginationControls from "../../../components/PaginationControls/PaginationControls";
 import ConfirmModal from "../../../components/ConfirmModal/ConfirmModal";
+import Toast from "../../../components/Toast/Toast";
 
-const EMPTY_FORM = { name: "", price: "" };
+const EMPTY_FORM = { name: "", price: "", durationMinutes: "30", description: "" };
 
 function ServicesSection() {
   const [cuts, setCuts] = useState([]);
@@ -20,27 +21,33 @@ function ServicesSection() {
 
   const [showForm, setShowForm] = useState(false);
   const [editingCut, setEditingCut] = useState(null);
-  const [deletingCut, setDeletingCut] = useState(null);
+  const [togglingCut, setTogglingCut] = useState(null);
 
   const [form, setForm] = useState(EMPTY_FORM);
   const [formError, setFormError] = useState("");
   const [formLoading, setFormLoading] = useState(false);
-
-  useEffect(() => {
-    loadCuts();
-  }, []);
+  const [toast, setToast] = useState(null);
+  const showToast = (message, type = "success") => setToast({ message, type });
 
   const loadCuts = () => {
-    setLoading(true);
     getAllCutsAdminService(
       (data) => { setCuts(data); setLoading(false); },
       () => { setError("No se pudieron cargar los servicios"); setLoading(false); }
     );
   };
 
+  useEffect(() => {
+    loadCuts();
+  }, []);
+
   const handleOpenEdit = (cut) => {
     setEditingCut(cut);
-    setForm({ name: cut.name, price: cut.price });
+    setForm({
+      name: cut.name,
+      price: String(cut.price),
+      durationMinutes: String(cut.durationMinutes),
+      description: cut.description || "",
+    });
     setFormError("");
     setShowForm(true);
   };
@@ -71,38 +78,53 @@ function ServicesSection() {
       setFormError("El nombre del servicio es obligatorio");
       return;
     }
-    if (!form.price || isNaN(Number(form.price)) || Number(form.price) <= 0) {
-      setFormError("El precio debe ser un número mayor a cero");
+    if (form.price === "" || isNaN(Number(form.price)) || Number(form.price) < 0) {
+      setFormError("El precio debe ser un número igual o mayor a cero");
+      return;
+    }
+    const duration = Number(form.durationMinutes);
+    if (!Number.isInteger(duration) || duration < 1 || duration > 480) {
+      setFormError("La duración debe ser un número entero de minutos, entre 1 y 480");
       return;
     }
 
     setFormLoading(true);
 
     // convertimos el precio a número porque viene del input como string
-    const data = { name: form.name, price: Number(form.price) };
+    const data = {
+      name: form.name,
+      price: Number(form.price),
+      durationMinutes: duration,
+      description: form.description,
+    };
+
+    const onSaved = (message) => () => {
+      setFormLoading(false);
+      handleCloseForm();
+      loadCuts();
+      showToast(message);
+    };
+    const onFailed = (err) => { setFormLoading(false); setFormError(err.message); };
 
     if (editingCut) {
-      updateCutAdminService(
-        editingCut.id,
-        data,
-        () => { setFormLoading(false); handleCloseForm(); loadCuts(); },
-        (err) => { setFormLoading(false); setFormError(err.message); }
-      );
+      updateCutAdminService(editingCut.id, data, onSaved("Servicio actualizado correctamente"), onFailed);
     } else {
-      createCutAdminService(
-        data,
-        () => { setFormLoading(false); handleCloseForm(); loadCuts(); },
-        (err) => { setFormLoading(false); setFormError(err.message); }
-      );
+      createCutAdminService(data, onSaved("Servicio creado correctamente"), onFailed);
     }
   };
 
-  const handleConfirmDelete = () => {
-    if (!deletingCut) return;
-    deleteCutAdminService(
-      deletingCut.id,
-      () => { setDeletingCut(null); loadCuts(); },
-      () => setDeletingCut(null)
+  const handleConfirmToggle = () => {
+    if (!togglingCut) return;
+    const activate = !togglingCut.isActive;
+    setCutActiveAdminService(
+      togglingCut.id,
+      activate,
+      () => {
+        setTogglingCut(null);
+        loadCuts();
+        showToast(activate ? "Servicio reactivado" : "Servicio desactivado");
+      },
+      (err) => { setTogglingCut(null); showToast(err.message, "danger"); }
     );
   };
 
@@ -129,22 +151,35 @@ function ServicesSection() {
                 <tr>
                   <th>Nombre</th>
                   <th>Precio</th>
+                  <th>Duración</th>
+                  <th>Estado</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {paginated.length === 0 ? (
                   <tr>
-                    <td colSpan={3} className="text-secondary text-center">
+                    <td colSpan={5} className="text-secondary text-center">
                       No hay servicios registrados
                     </td>
                   </tr>
                 ) : (
                   paginated.map((cut) => (
-                    <tr key={cut.id}>
-                      <td>{cut.name}</td>
+                    <tr key={cut.id} className={cut.isActive ? "" : "admin-row-inactive"}>
+                      <td>
+                        {cut.name}
+                        {cut.description && (
+                          <div className="admin-form-hint">{cut.description}</div>
+                        )}
+                      </td>
                       <td className="text-warning">
                         ${Number(cut.price).toLocaleString("es-AR")}
+                      </td>
+                      <td>{cut.durationMinutes} min</td>
+                      <td>
+                        <span className={`admin-status-badge ${cut.isActive ? "admin-status-badge-active" : "admin-status-badge-inactive"}`}>
+                          {cut.isActive ? "Activo" : "Desactivado"}
+                        </span>
                       </td>
                       <td>
                         <div className="admin-row-actions">
@@ -155,10 +190,10 @@ function ServicesSection() {
                             Editar
                           </button>
                           <button
-                            className="btn btn-sm btn-outline-danger"
-                            onClick={() => setDeletingCut(cut)}
+                            className={`btn btn-sm ${cut.isActive ? "btn-outline-danger" : "btn-outline-success"}`}
+                            onClick={() => setTogglingCut(cut)}
                           >
-                            Eliminar
+                            {cut.isActive ? "Desactivar" : "Reactivar"}
                           </button>
                         </div>
                       </td>
@@ -188,26 +223,63 @@ function ServicesSection() {
             </h3>
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
+                <label htmlFor="cut-name" className="admin-form-label">Nombre</label>
                 <input
+                  id="cut-name"
                   type="text"
                   name="name"
                   placeholder="Nombre del servicio"
                   value={form.name}
                   onChange={handleChange}
+                  maxLength={100}
                   className="form-control bg-secondary text-white border-secondary"
                   required
                 />
               </div>
-              <div className="mb-4">
+              <div className="mb-3">
+                <label htmlFor="cut-price" className="admin-form-label">Precio ($)</label>
                 <input
+                  id="cut-price"
                   type="number"
                   name="price"
                   placeholder="Precio"
                   value={form.price}
                   onChange={handleChange}
-                  min="1"
+                  min="0"
+                  step="0.01"
                   className="form-control bg-secondary text-white border-secondary"
                   required
+                />
+                {editingCut && (
+                  <p className="admin-form-hint">Los turnos ya reservados conservan el precio con el que se reservaron.</p>
+                )}
+              </div>
+              <div className="mb-3">
+                <label htmlFor="cut-duration" className="admin-form-label">Duración (minutos)</label>
+                <input
+                  id="cut-duration"
+                  type="number"
+                  name="durationMinutes"
+                  value={form.durationMinutes}
+                  onChange={handleChange}
+                  min="1"
+                  max="480"
+                  step="1"
+                  className="form-control bg-secondary text-white border-secondary"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="cut-description" className="admin-form-label">Descripción</label>
+                <textarea
+                  id="cut-description"
+                  name="description"
+                  placeholder="Descripción (opcional)"
+                  value={form.description}
+                  onChange={handleChange}
+                  maxLength={500}
+                  rows={3}
+                  className="form-control bg-secondary text-white border-secondary"
                 />
               </div>
 
@@ -239,14 +311,26 @@ function ServicesSection() {
         </div>
       )}
 
-      {deletingCut && (
+      {togglingCut && (
         <ConfirmModal
-          title="Eliminar servicio"
-          message={`¿Estás seguro de que querés eliminar el servicio "${deletingCut.name}"? Esta acción no se puede deshacer.`}
-          onConfirm={handleConfirmDelete}
-          onCancel={() => setDeletingCut(null)}
-          confirmLabel="Eliminar"
-          confirmClass="btn btn-danger"
+          title={togglingCut.isActive ? "Desactivar servicio" : "Reactivar servicio"}
+          message={
+            togglingCut.isActive
+              ? `El servicio "${togglingCut.name}" deja de aparecer en la reserva de turnos. El historial se conserva y podés reactivarlo cuando quieras.`
+              : `El servicio "${togglingCut.name}" vuelve a aparecer en la reserva de turnos.`
+          }
+          onConfirm={handleConfirmToggle}
+          onCancel={() => setTogglingCut(null)}
+          confirmLabel={togglingCut.isActive ? "Desactivar" : "Reactivar"}
+          confirmClass={togglingCut.isActive ? "btn btn-danger" : "btn btn-success"}
+        />
+      )}
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
         />
       )}
     </div>

@@ -78,218 +78,85 @@ export const deleteUserAdminService = (userId, onSuccess, onError) => {
     .catch(onError);
 };
 
+const catalogRequest = (path, method, body, fallbackError, onSuccess, onError) => {
+  fetch(`${BASE_URL}${path}`, {
+    method,
+    headers: authHeaders(),
+    body: body === undefined ? undefined : JSON.stringify(body),
+  })
+    .then(async (res) => {
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error(data?.error || fallbackError);
+      }
+      return data;
+    })
+    .then(onSuccess)
+    .catch(onError);
+};
+
 // ===== BARBEROS =====
 
-// trae todos los barberos (endpoint separado del de usuarios)
-export const getAllBarbersAdminService = (onSuccess, onError) => {
-  fetch(`${BASE_URL}/barbers`, {
-    headers: authHeaders(),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al obtener barberos");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
-};
+export const getAllBarbersAdminService = (onSuccess, onError) =>
+  catalogRequest("/barbers?includeInactive=true", "GET", undefined, "Error al obtener barberos", onSuccess, onError);
 
-// crea un barbero nuevo
-export const createBarberAdminService = (barberData, onSuccess, onError) => {
-  fetch(`${BASE_URL}/barbers`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify(barberData),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al crear barbero");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
-};
+export const createBarberAdminService = (barberData, onSuccess, onError) =>
+  catalogRequest("/barbers", "POST", barberData, "Error al crear barbero", onSuccess, onError);
 
-// actualiza los datos de un barbero, sin el mail
-export const updateBarberAdminService = (barberId, barberData, onSuccess, onError) => {
-  fetch(`${BASE_URL}/barbers/${barberId}`, {
-    method: "PUT",
-    headers: authHeaders(),
-    body: JSON.stringify(barberData),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al actualizar barbero");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
-};
+export const updateBarberAdminService = (barberId, barberData, onSuccess, onError) =>
+  catalogRequest(`/barbers/${barberId}`, "PUT", barberData, "Error al actualizar barbero", onSuccess, onError);
 
-// elimina un barbero por id
-export const deleteBarberAdminService = (barberId, onSuccess, onError) => {
-  fetch(`${BASE_URL}/barbers/${barberId}`, {
-    method: "DELETE",
-    headers: authHeaders(),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al eliminar barbero");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
-};
+export const setBarberActiveAdminService = (barberId, active, onSuccess, onError) =>
+  catalogRequest(
+    `/barbers/${barberId}/${active ? "activate" : "deactivate"}`,
+    "POST",
+    undefined,
+    active ? "Error al reactivar barbero" : "Error al desactivar barbero",
+    onSuccess,
+    onError,
+  );
 
 // ===== SUCURSALES =====
 
-// trae todas las sucursales
-export const getAllBranchesAdminService = (onSuccess, onError) => {
-  fetch(`${BASE_URL}/branches`, {
-    headers: authHeaders(),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al obtener sucursales");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
-};
+export const getAllBranchesAdminService = (onSuccess, onError) =>
+  catalogRequest("/branches?includeInactive=true", "GET", undefined, "Error al obtener sucursales", onSuccess, onError);
 
-// crea una sucursal nueva
-export const createBranchAdminService = (branchData, onSuccess, onError) => {
-  fetch(`${BASE_URL}/branches`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify(branchData),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al crear sucursal");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
-};
+export const createBranchAdminService = (branchData, onSuccess, onError) =>
+  catalogRequest("/branches", "POST", branchData, "Error al crear sucursal", onSuccess, onError);
 
-// actualiza los datos de una sucursal
-export const updateBranchAdminService = (branchId, branchData, onSuccess, onError) => {
-  fetch(`${BASE_URL}/branches/${branchId}`, {
-    method: "PUT",
-    headers: authHeaders(),
-    body: JSON.stringify(branchData),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al actualizar sucursal");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
-};
+export const updateBranchAdminService = (branchId, branchData, onSuccess, onError) =>
+  catalogRequest(`/branches/${branchId}`, "PUT", branchData, "Error al actualizar sucursal", onSuccess, onError);
 
-// elimina una sucursal por id
-export const deleteBranchAdminService = (branchId, onSuccess, onError) => {
-  fetch(`${BASE_URL}/branches/${branchId}`, {
-    method: "DELETE",
-    headers: authHeaders(),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al eliminar sucursal");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
-};
+export const setBranchActiveAdminService = (branchId, active, onSuccess, onError) =>
+  catalogRequest(
+    `/branches/${branchId}/${active ? "activate" : "deactivate"}`,
+    "POST",
+    undefined,
+    active ? "Error al reactivar sucursal" : "Error al desactivar sucursal",
+    onSuccess,
+    onError,
+  );
 
 // ===== SERVICIOS (cortes) =====
 
-// trae todos los servicios
-export const getAllCutsAdminService = (onSuccess, onError) => {
-  fetch(`${BASE_URL}/cuts`, {
-    headers: authHeaders(),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al obtener servicios");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
-};
+export const getAllCutsAdminService = (onSuccess, onError) =>
+  catalogRequest("/cuts?includeInactive=true", "GET", undefined, "Error al obtener servicios", onSuccess, onError);
 
-// crea un servicio nuevo
-export const createCutAdminService = (cutData, onSuccess, onError) => {
-  fetch(`${BASE_URL}/cuts`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify(cutData),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al crear servicio");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
-};
+export const createCutAdminService = (cutData, onSuccess, onError) =>
+  catalogRequest("/cuts", "POST", cutData, "Error al crear servicio", onSuccess, onError);
 
-// actualiza un servicio
-export const updateCutAdminService = (cutId, cutData, onSuccess, onError) => {
-  fetch(`${BASE_URL}/cuts/${cutId}`, {
-    method: "PUT",
-    headers: authHeaders(),
-    body: JSON.stringify(cutData),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al actualizar servicio");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
-};
+export const updateCutAdminService = (cutId, cutData, onSuccess, onError) =>
+  catalogRequest(`/cuts/${cutId}`, "PUT", cutData, "Error al actualizar servicio", onSuccess, onError);
 
-// elimina un servicio por id
-export const deleteCutAdminService = (cutId, onSuccess, onError) => {
-  fetch(`${BASE_URL}/cuts/${cutId}`, {
-    method: "DELETE",
-    headers: authHeaders(),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al eliminar servicio");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
-};
+export const setCutActiveAdminService = (cutId, active, onSuccess, onError) =>
+  catalogRequest(
+    `/cuts/${cutId}/${active ? "activate" : "deactivate"}`,
+    "POST",
+    undefined,
+    active ? "Error al reactivar servicio" : "Error al desactivar servicio",
+    onSuccess,
+    onError,
+  );
 
 // ===== TURNOS =====
 

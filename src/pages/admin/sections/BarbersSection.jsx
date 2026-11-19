@@ -3,7 +3,7 @@ import {
   getAllBarbersAdminService,
   createBarberAdminService,
   updateBarberAdminService,
-  deleteBarberAdminService,
+  setBarberActiveAdminService,
 } from "../../../services/admin.services";
 import { getAllBranchesAdminService } from "../../../services/admin.services";
 import PaginationControls from "../../../components/PaginationControls/PaginationControls";
@@ -14,11 +14,30 @@ const EMPTY_FORM = {
   name: "",
   email: "",
   password: "",
-  phone: "",
   branchId: "",
-  yearsOfExperience: "",
+  startDate: "",
   imageUrl: "",
 };
+
+const PASSWORD_RULE = /^(?=.*\p{L})(?=.*\d).{8,72}$/u;
+
+function yearsSince(startDate) {
+  if (!startDate) return null;
+  const [year, month, day] = startDate.split("-").map(Number);
+  const today = new Date();
+  let years = today.getFullYear() - year;
+  if (today.getMonth() + 1 < month || (today.getMonth() + 1 === month && today.getDate() < day)) {
+    years -= 1;
+  }
+  return Math.max(years, 0);
+}
+
+function todayInputValue() {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${today.getFullYear()}-${month}-${day}`;
+}
 
 function BarbersSection() {
   const [barbers, setBarbers] = useState([]);
@@ -32,13 +51,20 @@ function BarbersSection() {
 
   const [showForm, setShowForm] = useState(false);
   const [editingBarber, setEditingBarber] = useState(null);
-  const [deletingBarber, setDeletingBarber] = useState(null);
+  const [togglingBarber, setTogglingBarber] = useState(null);
 
   const [form, setForm] = useState(EMPTY_FORM);
   const [formError, setFormError] = useState("");
   const [formLoading, setFormLoading] = useState(false);
   const [toast, setToast] = useState(null);
   const showToast = (message, type = "success") => setToast({ message, type });
+
+  const loadBarbers = () => {
+    getAllBarbersAdminService(
+      (data) => { setBarbers(data); setLoading(false); },
+      () => { setError("No se pudieron cargar los barberos"); setLoading(false); }
+    );
+  };
 
   useEffect(() => {
     loadBarbers();
@@ -49,21 +75,14 @@ function BarbersSection() {
     );
   }, []);
 
-  const loadBarbers = () => {
-    setLoading(true);
-    getAllBarbersAdminService(
-      (data) => { setBarbers(data); setLoading(false); },
-      () => { setError("No se pudieron cargar los barberos"); setLoading(false); }
-    );
-  };
-
   const handleOpenEdit = (barber) => {
     setEditingBarber(barber);
     setForm({
       name: barber.name,
-      phone: barber.phone || "",
-      branchId: barber.branchId || "",
-      yearsOfExperience: barber.yearsOfExperience || "",
+      email: barber.email,
+      password: "",
+      branchId: String(barber.branchId),
+      startDate: barber.startDate || "",
       imageUrl: barber.imageUrl || "",
     });
     setFormError("");
@@ -89,16 +108,6 @@ function BarbersSection() {
     setFormError("");
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setForm((prev) => ({ ...prev, imageUrl: reader.result }));
-    };
-    reader.readAsDataURL(file);
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -106,61 +115,68 @@ function BarbersSection() {
       setFormError("El nombre es obligatorio");
       return;
     }
+    if (!form.branchId) {
+      setFormError("Elegí la sucursal del barbero");
+      return;
+    }
+    if (!editingBarber && !form.email.trim()) {
+      setFormError("El email es obligatorio");
+      return;
+    }
+    if ((!editingBarber || form.password) && !PASSWORD_RULE.test(form.password)) {
+      setFormError("La contraseña debe tener entre 8 y 72 caracteres, con al menos una letra y un número");
+      return;
+    }
 
     setFormLoading(true);
 
+    const common = {
+      name: form.name,
+      branchId: Number(form.branchId),
+      startDate: form.startDate || null,
+      imageUrl: form.imageUrl || null,
+    };
+    const onFailed = (err) => { setFormLoading(false); setFormError(err.message); };
+
     if (editingBarber) {
-      const updateData = {
-        name: form.name,
-        phone: form.phone,
-        branchId: form.branchId || null,
-        yearsOfExperience: form.yearsOfExperience,
-        imageUrl: form.imageUrl || null,
-      };
       updateBarberAdminService(
         editingBarber.id,
-        updateData,
-        () => { setFormLoading(false); handleCloseForm(); loadBarbers(); showToast("Barbero actualizado correctamente"); },
-        (err) => { setFormLoading(false); setFormError(err.message); }
+        { ...common, newPassword: form.password || null },
+        () => {
+          setFormLoading(false);
+          handleCloseForm();
+          loadBarbers();
+          showToast(form.password ? "Barbero actualizado con su nueva contraseña" : "Barbero actualizado correctamente");
+        },
+        onFailed
       );
     } else {
-      if (!form.email.trim()) {
-        setFormError("El email es obligatorio");
-        setFormLoading(false);
-        return;
-      }
-      if (!form.password.trim()) {
-        setFormError("La contraseña es obligatoria");
-        setFormLoading(false);
-        return;
-      }
-      if (form.password.length < 7) {
-        setFormError("La contraseña debe tener al menos 7 caracteres");
-        setFormLoading(false);
-        return;
-      }
       createBarberAdminService(
-        { ...form, branchId: form.branchId || null },
+        { ...common, email: form.email, password: form.password },
         () => { setFormLoading(false); handleCloseForm(); loadBarbers(); showToast("Barbero creado correctamente"); },
-        (err) => { setFormLoading(false); setFormError(err.message); }
+        onFailed
       );
     }
   };
 
-  const handleConfirmDelete = () => {
-    if (!deletingBarber) return;
-    deleteBarberAdminService(
-      deletingBarber.id,
-      () => { setDeletingBarber(null); loadBarbers(); showToast("Barbero eliminado correctamente"); },
-      () => { setDeletingBarber(null); showToast("No se pudo eliminar el barbero", "danger"); }
+  const handleConfirmToggle = () => {
+    if (!togglingBarber) return;
+    const activate = !togglingBarber.isActive;
+    setBarberActiveAdminService(
+      togglingBarber.id,
+      activate,
+      () => {
+        setTogglingBarber(null);
+        loadBarbers();
+        showToast(activate ? "Barbero reactivado" : "Barbero desactivado");
+      },
+      (err) => { setTogglingBarber(null); showToast(err.message, "danger"); }
     );
   };
 
-  // buscamos el nombre de la sucursal a partir del id que tiene el barbero
-  const getBranchName = (branchId) => {
-    const found = branches.find((b) => b.id === branchId);
-    return found ? found.name : "—";
-  };
+  const selectableBranches = branches.filter(
+    (b) => b.isActive || (editingBarber && b.id === editingBarber.branchId)
+  );
 
   const filteredBarbers = search.trim()
     ? barbers.filter(
@@ -193,6 +209,7 @@ function BarbersSection() {
             value={search}
             onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
             className="form-control bg-secondary text-white border-secondary mb-3"
+            aria-label="Buscar barberos por nombre o email"
           />
           <div className="table-responsive">
             <table className="admin-table">
@@ -200,9 +217,9 @@ function BarbersSection() {
                 <tr>
                   <th>Nombre</th>
                   <th>Email</th>
-                  <th>Teléfono</th>
                   <th>Sucursal</th>
                   <th>Experiencia</th>
+                  <th>Estado</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
@@ -214,31 +231,43 @@ function BarbersSection() {
                     </td>
                   </tr>
                 ) : (
-                  paginated.map((barber) => (
-                    <tr key={barber.id}>
-                      <td>{barber.name}</td>
-                      <td>{barber.email}</td>
-                      <td>{barber.phone || "—"}</td>
-                      <td>{getBranchName(barber.branchId)}</td>
-                      <td>{barber.yearsOfExperience ? `${barber.yearsOfExperience} años` : "—"}</td>
-                      <td>
-                        <div className="admin-row-actions">
-                          <button
-                            className="btn btn-sm btn-outline-warning"
-                            onClick={() => handleOpenEdit(barber)}
-                          >
-                            Editar
-                          </button>
-                          <button
-                            className="btn btn-sm btn-outline-danger"
-                            onClick={() => setDeletingBarber(barber)}
-                          >
-                            Eliminar
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                  paginated.map((barber) => {
+                    const years = yearsSince(barber.startDate);
+                    return (
+                      <tr key={barber.id} className={barber.isActive ? "" : "admin-row-inactive"}>
+                        <td>{barber.name}</td>
+                        <td>{barber.email}</td>
+                        <td>
+                          {barber.branch.name}
+                          {!barber.branchIsActive && (
+                            <div className="admin-form-hint">Sucursal desactivada</div>
+                          )}
+                        </td>
+                        <td>{years === null ? "—" : `${years} ${years === 1 ? "año" : "años"}`}</td>
+                        <td>
+                          <span className={`admin-status-badge ${barber.isActive ? "admin-status-badge-active" : "admin-status-badge-inactive"}`}>
+                            {barber.isActive ? "Activo" : "Desactivado"}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="admin-row-actions">
+                            <button
+                              className="btn btn-sm btn-outline-warning"
+                              onClick={() => handleOpenEdit(barber)}
+                            >
+                              Editar
+                            </button>
+                            <button
+                              className={`btn btn-sm ${barber.isActive ? "btn-outline-danger" : "btn-outline-success"}`}
+                              onClick={() => setTogglingBarber(barber)}
+                            >
+                              {barber.isActive ? "Desactivar" : "Reactivar"}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -263,101 +292,115 @@ function BarbersSection() {
             </h3>
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
+                <label htmlFor="barber-name" className="admin-form-label">Nombre completo</label>
                 <input
+                  id="barber-name"
                   type="text"
                   name="name"
                   placeholder="Nombre completo"
                   value={form.name}
                   onChange={handleChange}
+                  maxLength={100}
                   className="form-control bg-secondary text-white border-secondary"
                   required
                 />
               </div>
 
-              {/* email y contraseña solo al crear */}
-              {!editingBarber && (
-                <>
-                  <div className="mb-3">
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Email"
-                      value={form.email}
-                      onChange={handleChange}
-                      className="form-control bg-secondary text-white border-secondary"
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <input
-                      type="password"
-                      name="password"
-                      placeholder="Contraseña (mínimo 7 caracteres)"
-                      value={form.password}
-                      onChange={handleChange}
-                      className="form-control bg-secondary text-white border-secondary"
-                      required
-                    />
-                  </div>
-                </>
-              )}
+              <div className="mb-3">
+                <label htmlFor="barber-email" className="admin-form-label">Email</label>
+                <input
+                  id="barber-email"
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={form.email}
+                  onChange={handleChange}
+                  maxLength={254}
+                  className="form-control bg-secondary text-white border-secondary"
+                  disabled={Boolean(editingBarber)}
+                  required={!editingBarber}
+                />
+                {editingBarber && (
+                  <p className="admin-form-hint">El email no se puede modificar.</p>
+                )}
+              </div>
 
               <div className="mb-3">
+                <label htmlFor="barber-password" className="admin-form-label">
+                  {editingBarber ? "Nueva contraseña" : "Contraseña"}
+                </label>
                 <input
-                  type="text"
-                  name="phone"
-                  placeholder="Teléfono (opcional)"
-                  value={form.phone}
+                  id="barber-password"
+                  type="password"
+                  name="password"
+                  placeholder={editingBarber ? "Dejala vacía para no cambiarla" : "Mínimo 8 caracteres, con letras y números"}
+                  value={form.password}
                   onChange={handleChange}
+                  maxLength={72}
+                  autoComplete="new-password"
                   className="form-control bg-secondary text-white border-secondary"
+                  required={!editingBarber}
                 />
+                {editingBarber && (
+                  <p className="admin-form-hint">
+                    Si la completás, el barbero entra con esta contraseña desde ahora. No se le envía ningún mail.
+                  </p>
+                )}
               </div>
 
               {/* select de sucursal para asignarle una al barbero */}
               <div className="mb-3">
+                <label htmlFor="barber-branch" className="admin-form-label">Sucursal</label>
                 <select
+                  id="barber-branch"
                   name="branchId"
                   value={form.branchId}
                   onChange={handleChange}
                   className="form-select bg-secondary text-white border-secondary"
+                  required
                 >
-                  <option value="">Sin sucursal asignada</option>
-                  {branches.map((branch) => (
+                  <option value="">Elegí una sucursal</option>
+                  {selectableBranches.map((branch) => (
                     <option key={branch.id} value={branch.id}>
-                      {branch.name}
+                      {branch.name}{branch.isActive ? "" : " (desactivada)"}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div className="mb-3">
+                <label htmlFor="barber-start" className="admin-form-label">Fecha de inicio como barbero</label>
                 <input
-                  type="text"
-                  name="yearsOfExperience"
-                  placeholder="Años de experiencia (opcional)"
-                  value={form.yearsOfExperience}
+                  id="barber-start"
+                  type="date"
+                  name="startDate"
+                  value={form.startDate}
                   onChange={handleChange}
+                  max={todayInputValue()}
+                  min="1950-01-01"
                   className="form-control bg-secondary text-white border-secondary"
                 />
+                <p className="admin-form-hint">Se usa para calcular los años de experiencia (opcional).</p>
               </div>
 
               <div className="mb-4">
-
-                <label className="text-secondary d-block mb-1" style={{ fontSize: "13px" }}>
-                  Foto del barbero (opcional)
-                </label>
+                <label htmlFor="barber-image" className="admin-form-label">Foto</label>
                 <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-
+                  id="barber-image"
+                  type="url"
+                  name="imageUrl"
+                  placeholder="URL de la foto (opcional)"
+                  value={form.imageUrl}
+                  onChange={handleChange}
+                  maxLength={500}
                   className="form-control bg-secondary text-white border-secondary"
                 />
                 {form.imageUrl && (
                   <img
                     src={form.imageUrl}
-                    alt="preview"
+                    alt="Vista previa del barbero"
                     style={{ width: "72px", height: "72px", objectFit: "cover", borderRadius: "50%", marginTop: "8px", border: "2px solid #ffc107" }}
+                    onError={(e) => { e.target.style.display = "none"; }}
                   />
                 )}
               </div>
@@ -390,14 +433,18 @@ function BarbersSection() {
         </div>
       )}
 
-      {deletingBarber && (
+      {togglingBarber && (
         <ConfirmModal
-          title="Eliminar barbero"
-          message={`¿Estás seguro de que querés eliminar a ${deletingBarber.name}? Esta acción no se puede deshacer.`}
-          onConfirm={handleConfirmDelete}
-          onCancel={() => setDeletingBarber(null)}
-          confirmLabel="Eliminar"
-          confirmClass="btn btn-danger"
+          title={togglingBarber.isActive ? "Desactivar barbero" : "Reactivar barbero"}
+          message={
+            togglingBarber.isActive
+              ? `${togglingBarber.name} no podrá iniciar sesión ni aparecerá en la reserva de turnos. Su historial se conserva y podés reactivarlo cuando quieras.`
+              : `${togglingBarber.name} vuelve a poder iniciar sesión y a aparecer en la reserva de turnos.`
+          }
+          onConfirm={handleConfirmToggle}
+          onCancel={() => setTogglingBarber(null)}
+          confirmLabel={togglingBarber.isActive ? "Desactivar" : "Reactivar"}
+          confirmClass={togglingBarber.isActive ? "btn btn-danger" : "btn btn-success"}
         />
       )}
 

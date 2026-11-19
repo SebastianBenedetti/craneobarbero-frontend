@@ -3,10 +3,11 @@ import {
   getAllBranchesAdminService,
   createBranchAdminService,
   updateBranchAdminService,
-  deleteBranchAdminService,
+  setBranchActiveAdminService,
 } from "../../../services/admin.services";
 import PaginationControls from "../../../components/PaginationControls/PaginationControls";
 import ConfirmModal from "../../../components/ConfirmModal/ConfirmModal";
+import Toast from "../../../components/Toast/Toast";
 
 const EMPTY_FORM = { name: "", address: "", phone: "", imageUrl: "" };
 
@@ -20,23 +21,24 @@ function BranchesSection() {
 
   const [showForm, setShowForm] = useState(false);
   const [editingBranch, setEditingBranch] = useState(null);
-  const [deletingBranch, setDeletingBranch] = useState(null);
+  const [togglingBranch, setTogglingBranch] = useState(null);
 
   const [form, setForm] = useState(EMPTY_FORM);
   const [formError, setFormError] = useState("");
   const [formLoading, setFormLoading] = useState(false);
-
-  useEffect(() => {
-    loadBranches();
-  }, []);
+  const [toast, setToast] = useState(null);
+  const showToast = (message, type = "success") => setToast({ message, type });
 
   const loadBranches = () => {
-    setLoading(true);
     getAllBranchesAdminService(
       (data) => { setBranches(data); setLoading(false); },
       () => { setError("No se pudieron cargar las sucursales"); setLoading(false); }
     );
   };
+
+  useEffect(() => {
+    loadBranches();
+  }, []);
 
   const handleOpenEdit = (branch) => {
     setEditingBranch(branch);
@@ -64,16 +66,6 @@ function BranchesSection() {
     setFormError("");
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setForm((prev) => ({ ...prev, imageUrl: reader.result }));
-    };
-    reader.readAsDataURL(file);
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -84,28 +76,33 @@ function BranchesSection() {
 
     setFormLoading(true);
 
+    const onSaved = (message) => () => {
+      setFormLoading(false);
+      handleCloseForm();
+      loadBranches();
+      showToast(message);
+    };
+    const onFailed = (err) => { setFormLoading(false); setFormError(err.message); };
+
     if (editingBranch) {
-      updateBranchAdminService(
-        editingBranch.id,
-        form,
-        () => { setFormLoading(false); handleCloseForm(); loadBranches(); },
-        (err) => { setFormLoading(false); setFormError(err.message); }
-      );
+      updateBranchAdminService(editingBranch.id, form, onSaved("Sucursal actualizada correctamente"), onFailed);
     } else {
-      createBranchAdminService(
-        form,
-        () => { setFormLoading(false); handleCloseForm(); loadBranches(); },
-        (err) => { setFormLoading(false); setFormError(err.message); }
-      );
+      createBranchAdminService(form, onSaved("Sucursal creada correctamente"), onFailed);
     }
   };
 
-  const handleConfirmDelete = () => {
-    if (!deletingBranch) return;
-    deleteBranchAdminService(
-      deletingBranch.id,
-      () => { setDeletingBranch(null); loadBranches(); },
-      () => setDeletingBranch(null)
+  const handleConfirmToggle = () => {
+    if (!togglingBranch) return;
+    const activate = !togglingBranch.isActive;
+    setBranchActiveAdminService(
+      togglingBranch.id,
+      activate,
+      () => {
+        setTogglingBranch(null);
+        loadBranches();
+        showToast(activate ? "Sucursal reactivada" : "Sucursal desactivada");
+      },
+      (err) => { setTogglingBranch(null); showToast(err.message, "danger"); }
     );
   };
 
@@ -133,22 +130,28 @@ function BranchesSection() {
                   <th>Nombre</th>
                   <th>Dirección</th>
                   <th>Teléfono</th>
+                  <th>Estado</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {paginated.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="text-secondary text-center">
+                    <td colSpan={5} className="text-secondary text-center">
                       No hay sucursales registradas
                     </td>
                   </tr>
                 ) : (
                   paginated.map((branch) => (
-                    <tr key={branch.id}>
+                    <tr key={branch.id} className={branch.isActive ? "" : "admin-row-inactive"}>
                       <td>{branch.name}</td>
                       <td>{branch.address}</td>
                       <td>{branch.phone || "—"}</td>
+                      <td>
+                        <span className={`admin-status-badge ${branch.isActive ? "admin-status-badge-active" : "admin-status-badge-inactive"}`}>
+                          {branch.isActive ? "Activa" : "Desactivada"}
+                        </span>
+                      </td>
                       <td>
                         <div className="admin-row-actions">
                           <button
@@ -158,10 +161,10 @@ function BranchesSection() {
                             Editar
                           </button>
                           <button
-                            className="btn btn-sm btn-outline-danger"
-                            onClick={() => setDeletingBranch(branch)}
+                            className={`btn btn-sm ${branch.isActive ? "btn-outline-danger" : "btn-outline-success"}`}
+                            onClick={() => setTogglingBranch(branch)}
                           >
-                            Eliminar
+                            {branch.isActive ? "Desactivar" : "Reactivar"}
                           </button>
                         </div>
                       </td>
@@ -191,71 +194,65 @@ function BranchesSection() {
             </h3>
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
+                <label htmlFor="branch-name" className="admin-form-label">Nombre</label>
                 <input
+                  id="branch-name"
                   type="text"
                   name="name"
-                  placeholder="Nombre de la sucursal"
+                  placeholder="Ej.: Sucursal Centro"
                   value={form.name}
                   onChange={handleChange}
+                  maxLength={100}
                   className="form-control bg-secondary text-white border-secondary"
                   required
                 />
               </div>
               <div className="mb-3">
+                <label htmlFor="branch-address" className="admin-form-label">Dirección</label>
                 <input
+                  id="branch-address"
                   type="text"
                   name="address"
                   placeholder="Dirección"
                   value={form.address}
                   onChange={handleChange}
+                  maxLength={200}
                   className="form-control bg-secondary text-white border-secondary"
                   required
                 />
               </div>
               <div className="mb-3">
+                <label htmlFor="branch-phone" className="admin-form-label">Teléfono de contacto</label>
                 <input
-                  type="text"
+                  id="branch-phone"
+                  type="tel"
                   name="phone"
                   placeholder="Teléfono (opcional)"
                   value={form.phone}
                   onChange={handleChange}
+                  maxLength={30}
                   className="form-control bg-secondary text-white border-secondary"
                 />
+                <p className="admin-form-hint">Es el número que ven los clientes al sacar un turno en esta sucursal.</p>
               </div>
               <div className="mb-4">
+                <label htmlFor="branch-image" className="admin-form-label">Imagen</label>
                 <input
+                  id="branch-image"
                   type="url"
                   name="imageUrl"
                   placeholder="URL de imagen (opcional)"
                   value={form.imageUrl}
                   onChange={handleChange}
+                  maxLength={500}
                   className="form-control bg-secondary text-white border-secondary"
                 />
                 {form.imageUrl && (
                   <img
                     src={form.imageUrl}
-                    alt="Preview"
-                    style={{ marginTop: "8px", height: "80px", borderRadius: "6px", objectFit: "cover" }}
-                    onError={(e) => { e.target.style.display = "none"; }}
-                  />
-                )}
-              </div>
-
-              <div className="mb-4">
-                <label className="text-secondary d-block mb-1" style={{ fontSize: "13px" }}>
-                  Foto de la sucursal (opcional)
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="form-control bg-secondary text-white border-secondary"
-                />
-                {form.imageUrl && (
-                  <img
-                    src={form.imageUrl}
-                    alt="preview"
+                    alt="Vista previa de la sucursal"
                     style={{ width: "100%", maxHeight: "120px", objectFit: "cover", borderRadius: "6px", marginTop: "8px", border: "2px solid #ffc107" }}
+                    onError={(e) => { e.target.style.display = "none"; }}
                   />
                 )}
               </div>
@@ -288,14 +285,26 @@ function BranchesSection() {
         </div>
       )}
 
-      {deletingBranch && (
+      {togglingBranch && (
         <ConfirmModal
-          title="Eliminar sucursal"
-          message={`¿Estás seguro de que querés eliminar la sucursal "${deletingBranch.name}"? Esta acción no se puede deshacer.`}
-          onConfirm={handleConfirmDelete}
-          onCancel={() => setDeletingBranch(null)}
-          confirmLabel="Eliminar"
-          confirmClass="btn btn-danger"
+          title={togglingBranch.isActive ? "Desactivar sucursal" : "Reactivar sucursal"}
+          message={
+            togglingBranch.isActive
+              ? `La sucursal "${togglingBranch.name}" y sus barberos dejan de aparecer en la reserva de turnos. El historial se conserva y podés reactivarla cuando quieras.`
+              : `La sucursal "${togglingBranch.name}" vuelve a aparecer en la reserva de turnos.`
+          }
+          onConfirm={handleConfirmToggle}
+          onCancel={() => setTogglingBranch(null)}
+          confirmLabel={togglingBranch.isActive ? "Desactivar" : "Reactivar"}
+          confirmClass={togglingBranch.isActive ? "btn btn-danger" : "btn btn-success"}
+        />
+      )}
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
         />
       )}
     </div>
