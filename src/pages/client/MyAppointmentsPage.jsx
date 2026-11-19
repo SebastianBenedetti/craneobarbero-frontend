@@ -8,6 +8,8 @@ import { downloadAppointmentCalendar, getMyAppointments, payAppointment } from "
 
 const MODIFY_WINDOW_HOURS = 4;
 
+const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
+
 const money = (value) => `$${Number(value ?? 0).toLocaleString("es-AR")}`;
 
 // pagina donde el cliente logueado ve y gestiona sus propios turnos
@@ -139,8 +141,8 @@ function MyAppointmentsPage() {
           <div key={appointment.id} className="card bg-dark border-warning mb-3 p-4">
             <div className="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
               <div>
-                <span className="text-warning fw-bold text-capitalize" style={{ fontSize: "1rem" }}>
-                  {date.toLocaleDateString("es-AR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+                <span className="text-warning fw-bold" style={{ fontSize: "1rem" }}>
+                  {capitalize(date.toLocaleDateString("es-AR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }))}
                 </span>
                 <span className="text-secondary ms-2" style={{ fontSize: "0.9rem" }}>
                   {date.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false })}

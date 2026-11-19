@@ -3,15 +3,17 @@ import { useLocation, useNavigate } from "react-router";
 import AppointmentStatusBadge from "../../components/AppointmentStatusBadge/AppointmentStatusBadge";
 import { confirmPaymentReturn, downloadAppointmentCalendar, payAppointment } from "../../services/appointments.services";
 
+const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
+
 const formatDate = (iso) =>
-  new Date(iso).toLocaleString("es-AR", {
+  capitalize(new Date(iso).toLocaleString("es-AR", {
     weekday: "long",
     day: "numeric",
     month: "long",
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
-  });
+  }));
 
 function PaymentReturnPage() {
   const location = useLocation();
@@ -69,7 +71,7 @@ function PaymentReturnPage() {
         {appointment && (
           <>
             <div className="mb-3"><AppointmentStatusBadge appointment={appointment} forClient /></div>
-            <p className="text-light mb-1 text-capitalize">{formatDate(appointment.appointmentDate)}</p>
+            <p className="text-light mb-1">{formatDate(appointment.appointmentDate)}</p>
             <p className="text-light mb-1">Servicio: {appointment.cut?.name}</p>
             <p className="text-light mb-1">Barbero: {appointment.barber?.name}</p>
             <p className="text-light mb-3">Sucursal: {appointment.branch?.name} — {appointment.branch?.address}</p>
