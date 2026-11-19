@@ -1,0 +1,19 @@
+@import "./variables.css";
+
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.status-badge-paid { background: var(--status-paid); color: #0d1f0e; }
+.status-badge-unpaid { background: var(--status-unpaid); color: #1f1300; }
+.status-badge-completed { background: #2d4a5c; color: #d9eef9; }
+.status-badge-cancelled { background: var(--status-cancelled); color: #f0f0f0; }
+.status-badge-cancelled-paid { background: var(--status-cancelled-paid); color: #fff; }
+.status-badge-refunded { background: var(--status-refunded); color: #062430; }
+.status-badge-expired { background: var(--status-expired); color: #f0f0f0; border: 1px dashed #aaa; }

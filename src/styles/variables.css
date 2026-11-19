@@ -4,4 +4,10 @@
   --text-primary: #ffffff;
   --text-secondary: rgb(204, 204, 204);
   --bg-card: #1e1e1e;
+  --status-paid: #4caf50;
+  --status-unpaid: #ff9800;
+  --status-cancelled: #6c6c6c;
+  --status-cancelled-paid: #d9534f;
+  --status-refunded: #4fc3f7;
+  --status-expired: #555555;
 }

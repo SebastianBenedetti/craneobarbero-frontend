@@ -1,164 +1,126 @@
-import { useState, useEffect } from "react";
-import timeSlots from "../../data/timeSlots";
-import { updateAppointmentService } from "../../services/appointments.services";
-import { getBookedSlotsService } from "../AppointmentForm/appointment.services";
+import { useEffect, useState } from "react";
+import { PAYMENT_METHODS, getAvailableTimes, rescheduleAppointment } from "../../services/appointments.services";
+import { addDays, toDateKey, todayKey } from "../../utils/dates";
+import "../../styles/appointmentModal.css";
+import "../../styles/calendar.css";
 
-function AppointmentEditModal({ appointment, onClose, onSaved }) {
-  const existingDate = new Date(appointment.appointmentDate);
+const BOOKING_WINDOW_DAYS = 60;
 
-  // fecha local para evitar que el input muestre un día anterior en UTC-3
-  const toLocalDateStr = (d) => {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
-  };
-
-  const [newDate, setNewDate] = useState(toLocalDateStr(existingDate));
-
-  const existingHours = existingDate.getHours().toString().padStart(2, "0");
-  const existingMinutes = existingDate.getMinutes().toString().padStart(2, "0");
-  const existingTimeStr = `${existingHours}:${existingMinutes}`;
-  const matchedSlot = timeSlots.find((s) => s.time === existingTimeStr);
-
-  const [newTime, setNewTime] = useState(matchedSlot ? matchedSlot.id.toString() : "");
+function AppointmentEditModal({ appointment, staff = false, onClose, onSaved }) {
+  const current = new Date(appointment.appointmentDate);
+  const [date, setDate] = useState(toDateKey(current));
+  const [selected, setSelected] = useState(null);
+  const [times, setTimes] = useState({ key: null, list: [], error: "" });
+  const isManual = appointment.createdByRole && appointment.createdByRole !== "client";
+  const [paymentMethod, setPaymentMethod] = useState(appointment.paymentMethod ?? "");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [bookedTimes, setBookedTimes] = useState([]);
+  const [saving, setSaving] = useState(false);
+
+  const requestKey = `${appointment.barber?.id}|${appointment.cut?.id}|${date}`;
+  const loading = Boolean(date) && times.key !== requestKey;
 
   useEffect(() => {
-    if (!newDate || !appointment.barberId) return;
-    const day = new Date(newDate + "T00:00:00").getDay();
-    if (day === 0 || day === 1) { setBookedTimes([]); return; }
-    getBookedSlotsService(appointment.barberId, newDate)
-      .then((slots) => setBookedTimes(Array.isArray(slots) ? slots : []))
-      .catch(() => setBookedTimes([]));
-  }, [newDate, appointment.barberId]);
+    if (!date || !appointment.barber?.id || !appointment.cut?.id) return undefined;
+    let cancelled = false;
+    getAvailableTimes(appointment.barber.id, appointment.cut.id, date)
+      .then((data) => !cancelled && setTimes({ key: requestKey, list: data.times ?? [], error: "" }))
+      .catch((err) => !cancelled && setTimes({ key: requestKey, list: [], error: err.message }));
+    return () => { cancelled = true; };
+  }, [requestKey, date, appointment.barber?.id, appointment.cut?.id]);
 
-  const handleDateChange = (e) => {
-    setNewDate(e.target.value);
-    setNewTime("");
+  useEffect(() => {
+    const onKey = (e) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const paymentChanged = staff && isManual && paymentMethod && paymentMethod !== appointment.paymentMethod;
+
+  const save = async () => {
+    if (!selected && !paymentChanged) {
+      setError("Elegí un nuevo horario.");
+      return;
+    }
+    setSaving(true);
     setError("");
+    try {
+      const body = { appointmentDate: selected ?? appointment.appointmentDate };
+      if (paymentChanged) body.paymentMethod = paymentMethod;
+      const updated = await rescheduleAppointment(appointment.id, body);
+      onSaved(updated);
+    } catch (err) {
+      setError(err.message);
+      setSaving(false);
+    }
   };
-
-  const handleSave = () => {
-    if (!newDate || !newTime) {
-      setError("Seleccioná fecha y horario.");
-      return;
-    }
-
-    const day = new Date(newDate + "T00:00:00").getDay();
-    if (day === 0 || day === 1) {
-      setError("La barbería no trabaja el domingo ni el lunes. Elegí otro día.");
-      return;
-    }
-
-    const slot = timeSlots.find((s) => s.id === Number(newTime));
-    if (!slot) return;
-
-    if (bookedTimes.includes(slot.time)) {
-      setError("Ese horario ya está reservado. Elegí otro.");
-      return;
-    }
-
-    const [h, m] = slot.time.split(":");
-    const [yr, mo, dy] = newDate.split("-").map(Number);
-    const combined = new Date(yr, mo - 1, dy);
-    combined.setHours(Number(h), Number(m), 0, 0);
-
-    if (combined <= new Date()) {
-      setError("La fecha debe ser futura.");
-      return;
-    }
-
-    setError("");
-    setLoading(true);
-
-    updateAppointmentService(
-      appointment.id,
-      combined.toISOString(),
-      () => {
-        setLoading(false);
-        onSaved(appointment.id, combined.toISOString());
-      },
-      (err) => {
-        setLoading(false);
-        setError(err.message);
-      },
-    );
-  };
-
-  const selectedDayIndex = newDate ? new Date(newDate + "T00:00:00").getDay() : null;
-  const isClosedDay = selectedDayIndex === 0 || selectedDayIndex === 1;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-card" role="dialog" aria-modal="true" aria-labelledby="edit-title" onClick={(e) => e.stopPropagation()}>
+        <h3 className="modal-title" id="edit-title">Modificar turno</h3>
 
-        <h3 className="modal-title">Modificar turno</h3>
-
-        <div className="modal-row">
-          <span className="modal-label">Cliente</span>
-          <span>{appointment.client?.name || appointment.barber?.name || "—"}</span>
-        </div>
         <div className="modal-row">
           <span className="modal-label">Servicio</span>
-          <span>{appointment.cut?.name || appointment.Cut?.name || "—"}</span>
+          <span>{appointment.cut?.name ?? "—"}</span>
+        </div>
+        <div className="modal-row">
+          <span className="modal-label">Barbero</span>
+          <span>{appointment.barber?.name ?? "—"}</span>
         </div>
 
         <div className="modal-row">
-          <span className="modal-label">Nueva fecha</span>
+          <label className="modal-label" htmlFor="edit-date">Nueva fecha</label>
           <input
+            id="edit-date"
             type="date"
-            value={newDate}
-            min={toLocalDateStr(new Date())}
-            onChange={handleDateChange}
+            value={date}
+            min={todayKey()}
+            max={staff ? undefined : addDays(todayKey(), BOOKING_WINDOW_DAYS)}
+            onChange={(e) => { setDate(e.target.value); setSelected(null); setError(""); }}
             className="modal-date-input"
           />
         </div>
 
-        {isClosedDay && (
-          <p className="modal-error">
-            La barbería no trabaja el domingo ni el lunes. Elegí otro día.
-          </p>
+        {loading && <p className="modal-hint">Cargando horarios…</p>}
+        {!loading && times.error && <p className="modal-error">{times.error}</p>}
+        {!loading && !times.error && date && times.list.length === 0 && (
+          <p className="modal-hint">No hay horarios libres ese día. Probá con otra fecha.</p>
+        )}
+        {!loading && times.list.length > 0 && (
+          <div className="booking-times mb-3" role="group" aria-label="Horarios disponibles">
+            {times.list.map((slot) => (
+              <button
+                key={slot.startAt}
+                type="button"
+                aria-pressed={selected === slot.startAt}
+                className={`btn btn-sm ${selected === slot.startAt ? "btn-warning text-dark fw-bold" : "btn-dark text-white"}`}
+                onClick={() => { setSelected(slot.startAt); setError(""); }}
+              >
+                {slot.time}
+              </button>
+            ))}
+          </div>
         )}
 
-        {!isClosedDay && (
+        {staff && isManual && (
           <div className="modal-row">
-            <span className="modal-label">Nuevo horario</span>
-            <select
-              value={newTime}
-              onChange={(e) => { setNewTime(e.target.value); setError(""); }}
-              className="modal-date-input"
-            >
-              <option value="">Elegí un horario</option>
-              {timeSlots.map((slot) => {
-                const isBooked = bookedTimes.includes(slot.time);
-                return (
-                  <option key={slot.id} value={slot.id} disabled={isBooked}>
-                    {slot.time}{isBooked ? " — Ocupado" : ""}
-                  </option>
-                );
-              })}
+            <label className="modal-label" htmlFor="edit-payment">Medio de pago</label>
+            <select id="edit-payment" className="modal-date-input" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
+              {PAYMENT_METHODS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
             </select>
           </div>
         )}
 
-        {error && <p className="modal-error">{error}</p>}
+        {error && <p className="modal-error" role="alert">{error}</p>}
 
         <div className="modal-actions">
-          <button
-            className="btn-agenda-edit"
-            onClick={handleSave}
-            disabled={loading || isClosedDay}
-          >
-            {loading ? "Guardando..." : "Guardar cambio"}
+          <button className="btn-agenda-edit" onClick={save} disabled={saving}>
+            {saving ? "Guardando…" : "Guardar cambio"}
           </button>
           <button className="modal-close" onClick={onClose}>
-            Cancelar
+            Volver
           </button>
         </div>
-
       </div>
     </div>
   );
