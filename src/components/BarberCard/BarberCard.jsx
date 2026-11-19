@@ -36,7 +36,6 @@ function BarberCard({ isSelected, barber, onClick }) {
       <Card.Body className="card-body-custom">
         <Card.Title className="text-warning">{barber.name}</Card.Title>
         {years !== null && <p>Años de experiencia: {years}</p>}
-        <p>Telefono: {barber.phone}</p>
         <Button variant="warning" className="w-100" onClick={onClick}>
           Seleccionar barbero
         </Button>

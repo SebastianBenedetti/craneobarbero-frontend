@@ -35,7 +35,7 @@ function AboutPage() {
               <div className="branch-card-body">
                 <h3 className="branch-card-title">{branch.name}</h3>
                 <p>Dirección: {branch.address}</p>
-                <p>Teléfono: {branch.phone}</p>
+                {branch.phone && <p>Teléfono: {branch.phone}</p>}
                 <button
                   className="btn-outline-custom"
                   onClick={() => navigate("/appointment", { state: { branchId: branch.id } })}
