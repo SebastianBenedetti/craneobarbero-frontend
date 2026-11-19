@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import AppointmentEditModal from "../../components/AppointmentEditModal/AppointmentEditModal";
 import CancelAppointmentModal from "../../components/CancelAppointmentModal/CancelAppointmentModal";
 import AppointmentStatusBadge from "../../components/AppointmentStatusBadge/AppointmentStatusBadge";
-import { downloadAppointmentCalendar, getMyAppointments, payAppointment } from "../../services/appointments.services";
+import { getMyAppointments, payAppointment } from "../../services/appointments.services";
 
 const MODIFY_WINDOW_HOURS = 4;
 
@@ -192,18 +192,6 @@ function MyAppointmentsPage() {
                 <button className="btn btn-outline-danger btn-sm" onClick={() => setCancelingAppointment(appointment)}>
                   Cancelar turno
                 </button>
-                {appointment.status === "pending" && (
-                  <button
-                    className="btn btn-outline-light btn-sm"
-                    onClick={() =>
-                      downloadAppointmentCalendar(appointment.id).catch((err) =>
-                        setActionMsg({ id: appointment.id, text: err.message, type: "danger" }),
-                      )
-                    }
-                  >
-                    Agregar al calendario
-                  </button>
-                )}
               </div>
             )}
             {appointment.status === "pending" && !started && !canModify && (

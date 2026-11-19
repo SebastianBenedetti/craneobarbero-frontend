@@ -1,4 +1,4 @@
-import { apiDownload, apiGetAllPages, apiRequest } from "./api";
+import { apiGetAllPages, apiRequest } from "./api";
 
 export const PAYMENT_METHODS = [
   { value: "cash", label: "Efectivo" },
@@ -52,6 +52,3 @@ export const getAvailableTimes = (barberId, cutId, date) =>
 
 export const resendVerificationEmail = () =>
   apiRequest("/auth/resend-verification", { method: "POST", fallbackError: "No se pudo reenviar el mail" });
-
-export const downloadAppointmentCalendar = (id) =>
-  apiDownload(`/appointments/${id}/calendar.ics`, "turno-craneo-barbero.ics", "No se pudo generar el archivo del calendario");

@@ -60,23 +60,3 @@ export async function apiGetAllPages(path, fallbackError) {
   }
   return items;
 }
-
-export async function apiDownload(path, fileName, fallbackError) {
-  const token = localStorage.getItem(TOKEN_KEY);
-  const res = await fetch(`${BASE_URL}${path}`, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) {
-    const data = await res.json().catch(() => null);
-    throw new ApiError(describe(data, fallbackError), { status: res.status, code: data?.code });
-  }
-  const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}

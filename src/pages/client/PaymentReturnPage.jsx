@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import AppointmentStatusBadge from "../../components/AppointmentStatusBadge/AppointmentStatusBadge";
-import { confirmPaymentReturn, downloadAppointmentCalendar, payAppointment } from "../../services/appointments.services";
+import { confirmPaymentReturn, payAppointment } from "../../services/appointments.services";
 
 const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
 
@@ -76,7 +76,7 @@ function PaymentReturnPage() {
             <p className="text-light mb-1">Barbero: {appointment.barber?.name}</p>
             <p className="text-light mb-3">Sucursal: {appointment.branch?.name} — {appointment.branch?.address}</p>
 
-            {confirmed && <p className="text-secondary">Te enviamos un mail con la confirmación y el archivo para agregarlo al calendario.</p>}
+            {confirmed && <p className="text-secondary">Te enviamos un mail con la confirmación y los botones para agregarlo a tu calendario.</p>}
             {inProcess && <p className="text-secondary">Mercado Pago todavía está procesando el pago. Te avisamos por mail cuando se acredite.</p>}
             {waiting && !inProcess && (
               <p className="text-secondary">
@@ -92,12 +92,6 @@ function PaymentReturnPage() {
           {waiting && !inProcess && (
             <button className="btn btn-warning text-dark" onClick={() => retry(appointment.id)} disabled={paying}>
               {paying ? "Abriendo el pago…" : "Reintentar el pago"}
-            </button>
-          )}
-          {confirmed && (
-            <button className="btn btn-outline-light"
-              onClick={() => downloadAppointmentCalendar(appointment.id).catch((err) => setActionError(err.message))}>
-              Agregar al calendario
             </button>
           )}
           <button className="btn btn-outline-warning" onClick={() => navigate("/my-account/appointments")}>
