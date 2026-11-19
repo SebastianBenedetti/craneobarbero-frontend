@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 
 // Creamos el contexto de autenticación
 // Esto nos permite compartir el usuario logueado en toda la app sin pasar props de padre a hijo
@@ -20,24 +20,25 @@ function decodeToken(token) {
 
 // Proveedor del contexto de auth, envuelve toda la app en App.jsx
 // Cualquier componente dentro puede usar useAuth() para acceder al usuario logueado
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-
+function readStoredUser() {
   // Al cargar la app verificamos si hay un token guardado en localStorage
   // Si existe y no venció, restauramos el usuario automáticamente (para no perder la sesión al refrescar)
-  useEffect(() => {
-    const token = localStorage.getItem("barberia-token");
-    if (token) {
-      const decoded = decodeToken(token);
-      // exp está en segundos Unix, Date.now() en milisegundos, por eso multiplicamos por 1000
-      if (decoded && decoded.exp * 1000 > Date.now()) {
-        setUser(decoded);
-      } else {
-        // Si el token venció lo eliminamos del storage para forzar un nuevo login
-        localStorage.removeItem("barberia-token");
-      }
-    }
-  }, []);
+  const token = localStorage.getItem("barberia-token");
+  if (!token) return null;
+  const decoded = decodeToken(token);
+  // exp está en segundos Unix, Date.now() en milisegundos, por eso multiplicamos por 1000
+  if (decoded && decoded.exp * 1000 > Date.now()) {
+    return decoded;
+  }
+  // Si el token venció lo eliminamos del storage para forzar un nuevo login
+  localStorage.removeItem("barberia-token");
+  return null;
+}
+
+// Proveedor del contexto de auth, envuelve toda la app en App.jsx
+// Cualquier componente dentro puede usar useAuth() para acceder al usuario logueado
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(readStoredUser);
 
   // Guarda el token en localStorage y actualiza el estado del usuario
   // Se llama desde Login.jsx y Register.jsx después de recibir el JWT del servidor
