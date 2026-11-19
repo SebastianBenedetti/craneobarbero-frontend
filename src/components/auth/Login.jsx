@@ -1,6 +1,6 @@
 
 import { useRef, useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { loginService } from "./auth.services";
 
 const Login = ({ onLogin, onCancel, context }) => {
@@ -40,7 +40,7 @@ const Login = ({ onLogin, onCancel, context }) => {
       emailRef.current.focus();
       return;
     }
-    if (password.length < 7) {
+    if (!password) {
       setErrors({ ...error, password: true });
       passwordRef.current.focus();
       return;
@@ -106,9 +106,14 @@ const Login = ({ onLogin, onCancel, context }) => {
             className="text-danger"
             style={{ fontSize: "13px", marginTop: "4px" }}
           >
-            La contraseña debe tener al menos 7 caracteres.
+            Ingresá tu contraseña.
           </p>
         )}
+        <div className="text-end mt-2">
+          <Link to="/forgot-password" className="text-warning" style={{ fontSize: "13px" }} onClick={() => context === "modal" && onCancel?.()}>
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </div>
       </div>
 
       {serverError && (

@@ -10,73 +10,8 @@ const authHeaders = () => ({
 
 // ===== USUARIOS =====
 
-// trae todos los usuarios (clientes y barberos mezclados, filtramos en el frontend)
 export const getAllUsersService = (onSuccess, onError) => {
-  fetch(`${BASE_URL}/users`, {
-    headers: authHeaders(),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al obtener usuarios");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
-};
-
-// crea un usuario nuevo desde el panel admin, el rol viene en el body
-export const createUserAdminService = (userData, onSuccess, onError) => {
-  fetch(`${BASE_URL}/users`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify(userData),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al crear usuario");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
-};
-
-// actualiza los datos de un usuario, no mandamos el mail porque no se puede cambiar
-export const updateUserAdminService = (userId, userData, onSuccess, onError) => {
-  fetch(`${BASE_URL}/users/${userId}`, {
-    method: "PUT",
-    headers: authHeaders(),
-    body: JSON.stringify(userData),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al actualizar usuario");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
-};
-
-// elimina un usuario por id
-export const deleteUserAdminService = (userId, onSuccess, onError) => {
-  fetch(`${BASE_URL}/users/${userId}`, {
-    method: "DELETE",
-    headers: authHeaders(),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al eliminar usuario");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
+  apiGetAllPages("/users", "Error al obtener usuarios").then(onSuccess).catch(onError);
 };
 
 const catalogRequest = (path, method, body, fallbackError, onSuccess, onError) => {

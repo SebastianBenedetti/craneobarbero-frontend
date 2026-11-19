@@ -81,6 +81,9 @@ function Navbar() {
             >
               Mi agenda
             </Link>
+            <Link to="/barber/clients" className={isActive("/barber/clients")}>
+              Mis clientes
+            </Link>
           </>
         )}
 
@@ -111,8 +114,8 @@ function Navbar() {
             </button>
             {dropdownOpen && (
               <div className="navbar-dropdown">
-                <Link to="/my-account/change-password" onClick={closeAll}>
-                  Cambiar contraseña
+                <Link to="/my-account" onClick={closeAll}>
+                  Mi cuenta
                 </Link>
                 <button className="navbar-dropdown-logout" onClick={handleLogout}>
                   Cerrar sesión
@@ -132,8 +135,8 @@ function Navbar() {
             </button>
             {dropdownOpen && (
               <div className="navbar-dropdown">
-                <Link to="/my-account/change-password" onClick={closeAll}>
-                  Cambiar contraseña
+                <Link to="/my-account" onClick={closeAll}>
+                  Mi cuenta
                 </Link>
                 <button
                   className="navbar-dropdown-logout"
@@ -158,8 +161,8 @@ function Navbar() {
                 <Link to="/my-account/appointments" onClick={closeAll}>
                   Mis turnos
                 </Link>
-                <Link to="/my-account/change-password" onClick={closeAll}>
-                  Cambiar contraseña
+                <Link to="/my-account" onClick={closeAll}>
+                  Mi cuenta
                 </Link>
                 <button
                   className="navbar-dropdown-logout"

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router";
 import { useAuth } from "../../context/AuthContext";
-import ClientsSection from "./sections/ClientsSection";
+import UsersSection from "./sections/UsersSection";
 import BarbersSection from "./sections/BarbersSection";
 import BranchesSection from "./sections/BranchesSection";
 import ServicesSection from "./sections/ServicesSection";
@@ -11,6 +11,7 @@ import "../../styles/adminDashboard.css";
 // las pestañas disponibles con su id y etiqueta
 const TABS = [
   { id: "clients", label: "Clientes" },
+  { id: "admins", label: "Administradores" },
   { id: "barbers", label: "Barberos" },
   { id: "branches", label: "Sucursales" },
   { id: "services", label: "Servicios" },
@@ -47,7 +48,9 @@ function AdminManagePage() {
   const renderSection = () => {
     switch (activeTab) {
       case "clients":
-        return <ClientsSection />;
+        return <UsersSection key="client" role="client" />;
+      case "admins":
+        return <UsersSection key="admin" role="admin" />;
       case "barbers":
         return <BarbersSection />;
       case "branches":
@@ -57,7 +60,7 @@ function AdminManagePage() {
       case "appointments":
         return <AppointmentsSection />;
       default:
-        return <ClientsSection />;
+        return <UsersSection key="client" role="client" />;
     }
   };
 

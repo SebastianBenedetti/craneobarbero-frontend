@@ -8,6 +8,7 @@
 
 import { useRef, useState } from "react";
 import { registerService } from "./auth.services";
+import { isStrongPassword, PASSWORD_POLICY } from "../../utils/password";
 
 const Register = ({ onRegister, onCancel }) => {
     const [name, setName] = useState("");
@@ -46,7 +47,7 @@ const Register = ({ onRegister, onCancel }) => {
             emailRef.current.focus();
             return;
         }
-        if (password.length < 7) {
+        if (!isStrongPassword(password)) {
             setErrors({ ...error, password: true });
             passwordRef.current.focus();
             return;
@@ -122,14 +123,14 @@ const Register = ({ onRegister, onCancel }) => {
                     type="password"
                     required
                     ref={passwordRef}
-                    placeholder="Contraseña (mínimo 7 caracteres)"
+                    placeholder="Contraseña (mínimo 8, con letras y números)"
                     onChange={(e) => { setPassword(e.target.value); clearError("password"); }}
                     value={password}
                     className={`form-control bg-secondary text-white border-${error.password ? "danger" : "secondary"}`}
                 />
                 {error.password && (
                     <p className="text-danger" style={{ fontSize: "13px", marginTop: "4px" }}>
-                        La contraseña debe tener al menos 7 caracteres.
+                        {PASSWORD_POLICY}
                     </p>
                 )}
             </div>
