@@ -1,9 +1,9 @@
 import { useState } from "react";
-import timeSlots from "../../data/timeSlots";
 import Login from "../auth/Login";
 import Register from "../auth/Register";
 import { useAuth } from "../../context/AuthContext";
 import { createAppointmentService } from "./appointment.services";
+import { fromDateKey } from "../../utils/dates";
 
 function AppointmentForm({
   branch,
@@ -14,7 +14,6 @@ function AppointmentForm({
   branches,
   barbers,
   cuts,
-  timeSlots,
 }) {
   const { user, login } = useAuth();
   const [showModal, setShowModal] = useState(false);
@@ -25,22 +24,15 @@ function AppointmentForm({
 
   const selectedBranch = branches.find((b) => b.id === branch);
   const selectedBarber = barbers.find((barb) => barb.id === barber);
-  const selectedHour = timeSlots.find((hour) => hour.id === hours);
   const selectedCut = cuts.find((c) => c.id === cut);
 
   const handleConfirm = () => {
     if (!user) { openModal(); return; }
-    const slot = timeSlots.find((s) => s.id === hours);
-    if (!slot) return;
-    const [h, m] = slot.time.split(":");
-    const date = new Date(day);
-    date.setHours(Number(h), Number(m), 0, 0);
     setConfirmError("");
     setConfirmLoading(true);
     createAppointmentService(
-      user.id,
       barber,
-      date.toISOString(),
+      hours.startAt,
       cut,
       () => { setConfirmLoading(false); setConfirmed(true); },
       (err) => { setConfirmLoading(false); setConfirmError(err.message); }
@@ -66,18 +58,11 @@ function AppointmentForm({
   const handleLoginSuccess = (token) => {
     login(token);
     closeModal();
-    const decoded = JSON.parse(atob(token.split(".")[1]));
-    const slot = timeSlots.find((s) => s.id === hours);
-    if (!slot) return;
-    const [h, m] = slot.time.split(":");
-    const date = new Date(day);
-    date.setHours(Number(h), Number(m), 0, 0);
     setConfirmError("");
     setConfirmLoading(true);
     createAppointmentService(
-      decoded.id,
       barber,
-      date.toISOString(),
+      hours.startAt,
       cut,
       () => { setConfirmLoading(false); setConfirmed(true); },
       (err) => { setConfirmLoading(false); setConfirmError(err.message); }
@@ -87,18 +72,11 @@ function AppointmentForm({
   const handleRegisterSuccess = (token) => {
     login(token);
     closeModal();
-    const decoded = JSON.parse(atob(token.split(".")[1]));
-    const slot = timeSlots.find((s) => s.id === hours);
-    if (!slot) return;
-    const [h, m] = slot.time.split(":");
-    const date = new Date(day);
-    date.setHours(Number(h), Number(m), 0, 0);
     setConfirmError("");
     setConfirmLoading(true);
     createAppointmentService(
-      decoded.id,
       barber,
-      date.toISOString(),
+      hours.startAt,
       cut,
       () => { setConfirmLoading(false); setConfirmed(true); },
       (err) => { setConfirmLoading(false); setConfirmError(err.message); }
@@ -112,9 +90,9 @@ function AppointmentForm({
         <div className="text-light mb-1">Sucursal: {selectedBranch.name}</div>
         <div className="text-light mb-1">Barbero: {selectedBarber.name}</div>
         <div className="text-light mb-1">
-          Fecha: {day.toLocaleDateString("es-AR")}
+          Fecha: {fromDateKey(day).toLocaleDateString("es-AR")}
         </div>
-        <div className="text-light mb-1">Horario: {selectedHour.time}</div>
+        <div className="text-light mb-1">Horario: {hours.time}</div>
         <div className="text-light mb-1">
           Servicio: {selectedCut.name} — {selectedCut.price}
         </div>

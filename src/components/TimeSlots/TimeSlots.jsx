@@ -1,54 +1,46 @@
 import { useState, useEffect } from "react";
-import { getBookedSlotsService } from "../AppointmentForm/appointment.services";
+import { getAvailabilityTimes } from "../../services/schedule.services";
+import "../../styles/calendar.css";
 
-function TimeSlots({
-  hours,
-  selectedBranch,
-  selectedBarber,
-  selectedDay,
-  onSelectHour,
-}) {
+function TimeSlots({ selectedBarber, selectedCut, selectedDay, onSelectHour }) {
   const [selected, setSelected] = useState(null);
-  const [bookedTimes, setBookedTimes] = useState([]);
+  const [result, setResult] = useState({ key: null, times: [], error: "" });
+  const requestKey = `${selectedBarber}|${selectedCut}|${selectedDay}`;
+  const loading = result.key !== requestKey;
 
   useEffect(() => {
-    if (!selectedBarber || !selectedDay) return;
-    getBookedSlotsService(selectedBarber, selectedDay)
-      .then((slots) => setBookedTimes(Array.isArray(slots) ? slots : []))
-      .catch(() => setBookedTimes([]));
-  }, [selectedBarber, selectedDay]);
-
-  const mapedHours = hours
-    .filter((hour) => !bookedTimes.includes(hour.time))
-    .map((hour) => {
-      const isSelected = selected === hour.id;
-      const className = `btn w-100 p-2 ${isSelected ? "btn-warning text-white" : "btn-dark text-white"}`;
-
-      return (
-        <button
-          className={className}
-          key={hour.id}
-          onClick={() => {
-            setSelected(hour.id);
-            onSelectHour(hour.id);
-          }}
-        >
-          {hour.time}
-        </button>
-      );
-    });
+    let cancelled = false;
+    getAvailabilityTimes(selectedBarber, selectedCut, selectedDay)
+      .then((data) => !cancelled && setResult({ key: requestKey, times: data.times ?? [], error: "" }))
+      .catch((err) => !cancelled && setResult({ key: requestKey, times: [], error: err.message }));
+    return () => { cancelled = true; };
+  }, [requestKey, selectedBarber, selectedCut, selectedDay]);
 
   return (
     <div className="mt-4">
       <h5 className="btn-dark text-white w-100 p-1 mb-3">Elegí un horario</h5>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(10, auto)",
-          gap: "8px",
-        }}
-      >
-        {mapedHours}
+      {loading && <p className="text-secondary">Cargando horarios…</p>}
+      {!loading && result.error && <div className="alert alert-danger py-2">{result.error}</div>}
+      {!loading && !result.error && result.times.length === 0 && (
+        <p className="text-secondary">No quedan horarios libres ese día. Probá con otro.</p>
+      )}
+      <div className="booking-times">
+        {!loading && result.times.map((slot) => {
+          const isSelected = selected === slot.startAt;
+          return (
+            <button
+              className={`btn w-100 p-2 ${isSelected ? "btn-warning text-dark fw-bold" : "btn-dark text-white"}`}
+              key={slot.startAt}
+              aria-pressed={isSelected}
+              onClick={() => {
+                setSelected(slot.startAt);
+                onSelectHour(slot);
+              }}
+            >
+              {slot.time}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

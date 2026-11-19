@@ -5,7 +5,6 @@ import BranchSelector from "../../components/BranchSelector/BranchSelector";
 import Calendar from "../../components/Calendar/Calendar";
 import TimeSlots from "../../components/TimeSlots/TimeSlots";
 import CutSelector from "../../components/CutSelector/CutSelector";
-import timeSlots from "../../data/timeSlots";
 import "../../styles/appointment.css";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router";
@@ -42,12 +41,12 @@ function AppointmentPage() {
 
   const handleSelectDay = (day) => {
     setDay(day);
-    setSelectedCut(null);
     setHour(null);
   };
 
   const handleSelectCut = (cutId) => {
     setSelectedCut(cutId);
+    setDay(null);
     setHour(null);
   };
 
@@ -83,23 +82,23 @@ function AppointmentPage() {
         />
       )}
       {selectedBarber && (
+        <CutSelector key={selectedBarber} cuts={cuts} onSelectCut={handleSelectCut} />
+      )}
+
+      {selectedBarber && selectedCut && (
         <Calendar
-          key={selectedBarber}
-          selectedBranch={selectedBranch}
+          key={`${selectedBarber}-${selectedCut}`}
           selectedBarber={selectedBarber}
+          selectedCut={selectedCut}
           onSelectDay={handleSelectDay}
         />
-      )}
-      {day && (
-        <CutSelector key={day.toISOString()} cuts={cuts} onSelectCut={handleSelectCut} />
       )}
 
       {day && selectedCut && (
         <TimeSlots
-          hours={timeSlots}
-          key={selectedBarber + day}
-          selectedBranch={selectedBranch}
+          key={`${selectedBarber}-${selectedCut}-${day}`}
           selectedBarber={selectedBarber}
+          selectedCut={selectedCut}
           selectedDay={day}
           onSelectHour={handleSelectHour}
         />
@@ -115,7 +114,6 @@ function AppointmentPage() {
           branches={branches}
           barbers={barbers}
           cuts={cuts}
-          timeSlots={timeSlots}
         />
       )}
     </div>
