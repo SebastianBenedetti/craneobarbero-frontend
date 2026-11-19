@@ -1,3 +1,4 @@
+import { fetchAllPages } from "../../services/pagedRequest";
 // Servicios de cuenta del usuario autenticado
 // A diferencia de auth.services.js, estas rutas son protegidas: requieren el token JWT en cada petición
 // El backend identifica al usuario a partir del token, no es necesario pasar el userId en la mayoría de los casos
@@ -13,18 +14,7 @@ const authHeaders = () => ({
 // Trae todos los turnos del cliente que está logueado
 // El backend extrae el id del usuario desde el JWT para filtrar solo sus turnos
 export const getMyAppointmentsService = (onSuccess, onError) => {
-  fetch(`${BASE_URL}/appointments/my`, {
-    headers: authHeaders(),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al obtener turnos");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
+  fetchAllPages("/appointments/my", "Error al obtener turnos").then(onSuccess).catch(onError);
 };
 
 // Cambia la contraseña del usuario autenticado

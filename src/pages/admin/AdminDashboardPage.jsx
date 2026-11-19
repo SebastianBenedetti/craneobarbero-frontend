@@ -76,8 +76,8 @@ function AdminDashboardPage() {
 
   // sumamos el precio de cada turno completado para calcular lo facturado
   const totalRevenue = filteredAppointments
-    .filter((a) => a.status === "completed" && a.cut?.price)
-    .reduce((sum, a) => sum + Number(a.cut.price), 0);
+    .filter((a) => a.paymentStatus === "paid" && a.price != null)
+    .reduce((sum, a) => sum + Number(a.price), 0);
 
   // solo contamos los usuarios con rol "client", los admin no se incluyen
   const totalClients = users.filter((u) => u.role === "client").length;
@@ -96,7 +96,7 @@ function AdminDashboardPage() {
   // cruzamos los turnos completados con las sucursales para saber cuantos atendio cada una
   const appointmentsByBranch = branches.map((branch) => {
     const count = filteredAppointments.filter(
-      (a) => a.status === "completed" && a.barber?.branchId === branch.id
+      (a) => a.status === "completed" && a.branch?.id === branch.id
     ).length;
     return { name: branch.name, count };
   });

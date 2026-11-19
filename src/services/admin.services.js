@@ -1,3 +1,4 @@
+import { fetchAllPages } from "./pagedRequest";
 // servicios que usa el panel del admin para todas las operaciones de gestiÃ³n
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -162,18 +163,7 @@ export const setCutActiveAdminService = (cutId, active, onSuccess, onError) =>
 
 // trae todos los turnos (el admin ve todos sin filtrar)
 export const getAllAppointmentsAdminService = (onSuccess, onError) => {
-  fetch(`${BASE_URL}/appointments`, {
-    headers: authHeaders(),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al obtener turnos");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
+  fetchAllPages("/appointments", "Error al obtener turnos").then(onSuccess).catch(onError);
 };
 
 // crea un turno desde el panel admin
