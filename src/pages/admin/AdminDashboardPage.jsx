@@ -274,12 +274,6 @@ function AdminDashboardPage() {
               >
                 Turnos
               </button>
-              <button
-                className="admin-quick-btn"
-                onClick={() => navigate("/admin/manage?tab=agenda")}
-              >
-                Agenda
-              </button>
             </div>
           </section>
         </>

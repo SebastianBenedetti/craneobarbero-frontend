@@ -15,6 +15,7 @@ import MyAppointmentsPage from "../../pages/client/MyAppointmentsPage";
 import ChangePasswordPage from "../../pages/client/ChangePasswordPage";
 import AdminDashboardPage from "../../pages/admin/AdminDashboardPage";
 import AdminManagePage from "../../pages/admin/AdminManagePage";
+import AdminAgendaPage from "../../pages/admin/AdminAgendaPage";
 
 function AppRouter() {
   return (
@@ -46,6 +47,7 @@ function AppRouter() {
               <Route path="/admin">
                 <Route index element={<AdminDashboardPage />} />
                 <Route path="manage" element={<AdminManagePage />} />
+                <Route path="agenda" element={<AdminAgendaPage />} />
               </Route>
             </Route>
           </Route>

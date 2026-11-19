@@ -90,6 +90,9 @@ function Navbar() {
             <Link to="/admin" className={isActive("/admin")}>
               Inicio
             </Link>
+            <Link to="/admin/agenda" className={isActive("/admin/agenda")}>
+              Agenda
+            </Link>
             <Link to="/admin/manage" className={isActive("/admin/manage")}>
               Gestionar
             </Link>
