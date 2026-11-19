@@ -5,6 +5,7 @@ import { getMyAppointmentsService } from "../../components/auth/account.services
 import { cancelAppointmentService } from "../../services/appointments.services";
 import AppointmentEditModal from "../../components/AppointmentEditModal/AppointmentEditModal";
 import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
+import { downloadAppointmentCalendar } from "../../services/calendar.services";
 
 // etiquetas y colores para mostrar el estado del turno de forma legible
 const STATUS_LABELS = {
@@ -219,6 +220,18 @@ function MyAppointmentsPage() {
                 >
                   Cancelar turno
                 </button>
+                {appointment.status === "pending" && (
+                  <button
+                    className="btn btn-outline-light btn-sm"
+                    onClick={() =>
+                      downloadAppointmentCalendar(appointment.id).catch((err) =>
+                        setActionMsg({ id: appointment.id, text: err.message, type: "danger" }),
+                      )
+                    }
+                  >
+                    Agregar al calendario
+                  </button>
+                )}
               </div>
             )}
           </div>
