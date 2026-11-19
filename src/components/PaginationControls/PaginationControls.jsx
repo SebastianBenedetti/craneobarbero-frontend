@@ -1,4 +1,4 @@
-// componente de paginado reutilizable, lo usamos en la agenda del barber, el superadmin y donde haga falta
+// componente de paginado reutilizable, lo usamos en la agenda del barber, el panel del admin y donde haga falta
 // recibe los datos de la página actual y funciones para cambiarla
 // sizes son los tamaños de página disponibles, por defecto 10/25/50
 function PaginationControls({

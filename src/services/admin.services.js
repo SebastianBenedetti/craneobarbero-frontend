@@ -1,4 +1,4 @@
-import { fetchAllPages } from "./pagedRequest";
+import { apiGetAllPages } from "./api";
 // servicios que usa el panel del admin para todas las operaciones de gestiÃ³n
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -163,40 +163,5 @@ export const setCutActiveAdminService = (cutId, active, onSuccess, onError) =>
 
 // trae todos los turnos (el admin ve todos sin filtrar)
 export const getAllAppointmentsAdminService = (onSuccess, onError) => {
-  fetchAllPages("/appointments", "Error al obtener turnos").then(onSuccess).catch(onError);
-};
-
-// crea un turno desde el panel admin
-export const createAppointmentAdminService = (appointmentData, onSuccess, onError) => {
-  fetch(`${BASE_URL}/appointments`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify(appointmentData),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al crear turno");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
-};
-
-// elimina un turno por id
-export const deleteAppointmentAdminService = (appointmentId, onSuccess, onError) => {
-  fetch(`${BASE_URL}/appointments/${appointmentId}`, {
-    method: "DELETE",
-    headers: authHeaders(),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al eliminar turno");
-      }
-      return res.json();
-    })
-    .then(onSuccess)
-    .catch(onError);
+  apiGetAllPages("/appointments", "Error al obtener turnos").then(onSuccess).catch(onError);
 };

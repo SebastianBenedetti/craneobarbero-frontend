@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { SESSION_EXPIRED_EVENT } from "../services/api";
 
 // Creamos el contexto de autenticación
 // Esto nos permite compartir el usuario logueado en toda la app sin pasar props de padre a hijo
@@ -39,6 +40,13 @@ function readStoredUser() {
 // Cualquier componente dentro puede usar useAuth() para acceder al usuario logueado
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(readStoredUser);
+
+  // si el servidor responde 401 (sesion vencida o cuenta desactivada) cerramos la sesion
+  useEffect(() => {
+    const onExpired = () => setUser(null);
+    window.addEventListener(SESSION_EXPIRED_EVENT, onExpired);
+    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, onExpired);
+  }, []);
 
   // Guarda el token en localStorage y actualiza el estado del usuario
   // Se llama desde Login.jsx y Register.jsx después de recibir el JWT del servidor

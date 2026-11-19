@@ -219,7 +219,7 @@ function ClientsSection() {
                       <td>{client.email}</td>
                       <td>{client.phone || "—"}</td>
                       <td>
-                        <span className={`badge bg-${client.role === "admin" || client.role === "superadmin" ? "warning text-dark" : "secondary"}`}>
+                        <span className={`badge bg-${client.role === "admin" ? "warning text-dark" : "secondary"}`}>
                           {client.role}
                         </span>
                       </td>

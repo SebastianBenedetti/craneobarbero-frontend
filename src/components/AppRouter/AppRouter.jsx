@@ -13,6 +13,7 @@ import BarberDashboardPage from "../../pages/barber/BarberDashboardPage";
 import BarberSchedulePage from "../../pages/barber/BarberSchedulePage";
 import MyAppointmentsPage from "../../pages/client/MyAppointmentsPage";
 import ChangePasswordPage from "../../pages/client/ChangePasswordPage";
+import PaymentReturnPage from "../../pages/client/PaymentReturnPage";
 import AdminDashboardPage from "../../pages/admin/AdminDashboardPage";
 import AdminManagePage from "../../pages/admin/AdminManagePage";
 import AdminAgendaPage from "../../pages/admin/AdminAgendaPage";
@@ -36,6 +37,10 @@ function AppRouter() {
               </Route>
             </Route>
 
+            <Route element={<ProtectedRoute roles={["client"]} />}>
+              <Route path="/payments/return" element={<PaymentReturnPage />} />
+            </Route>
+
             <Route element={<ProtectedRoute />}>
               <Route path="/my-account">
                 <Route path="appointments" element={<MyAppointmentsPage />} />
@@ -43,7 +48,7 @@ function AppRouter() {
               </Route>
             </Route>
 
-            <Route element={<ProtectedRoute roles={["admin", "superadmin"]} />}>
+            <Route element={<ProtectedRoute roles={["admin"]} />}>
               <Route path="/admin">
                 <Route index element={<AdminDashboardPage />} />
                 <Route path="manage" element={<AdminManagePage />} />
