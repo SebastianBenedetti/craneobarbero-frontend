@@ -13,6 +13,7 @@ import {
   updateMe,
 } from "../../services/account.services";
 import { isStrongPassword, PASSWORD_POLICY } from "../../utils/password";
+import { IMAGE_URL_HINT, IMAGE_URL_PATTERN } from "../../utils/image";
 import "../../styles/myAccount.css";
 
 const INPUT = "form-control bg-secondary text-white border-secondary";
@@ -54,7 +55,7 @@ function ProfileForm({ me, onSaved }) {
         </>
       )}
       <label className="form-label text-light" htmlFor="account-image">Foto (dirección web, opcional)</label>
-      <input id="account-image" name="imageUrl" type="url" className={`${INPUT} mb-3`} value={form.imageUrl} onChange={change} maxLength={500} placeholder="https://…" />
+      <input id="account-image" name="imageUrl" type="text" inputMode="url" pattern={IMAGE_URL_PATTERN} title={IMAGE_URL_HINT} className={`${INPUT} mb-3`} value={form.imageUrl} onChange={change} maxLength={500} placeholder="https://…" />
       {error && <p className="text-danger" role="alert" style={{ fontSize: "14px" }}>{error}</p>}
       <button type="submit" className="btn btn-warning text-dark" disabled={saving}>
         {saving ? "Guardando…" : "Guardar cambios"}
