@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import PieChart from "../../components/PieChart/PieChart";
 import ReportFilters, { IncomeBars, StatCard } from "../../components/ReportFilters/ReportFilters";
 import { getBarberClients, getBarberPeriods, getBarberServices, getBarberSummary } from "../../services/reports.services";
 import { currentMonthPeriod } from "../../utils/dates";
-import { formatMoney } from "../../utils/format";
+import { appointmentStatusNames, formatMoney, formatTurns } from "../../utils/format";
 import "../../styles/adminDashboard.css";
 import "../../styles/reports.css";
 
@@ -52,6 +53,21 @@ function BarberReportsPage() {
             <StatCard label="Turnos completados" value={summary.completed} />
             <StatCard label="Pagados por adelantado" value={formatMoney(summary.prepaid.amount)} hint={`${summary.prepaid.count} turnos futuros`} />
             <StatCard label="Cancelados" value={summary.byStatus.cancelled} hint={`${summary.byStatus.pending} pendientes`} />
+          </div>
+
+          <div className="admin-section">
+            <div className="report-pies">
+              <PieChart
+                title="Mis turnos por estado"
+                format={formatTurns}
+                data={Object.entries(summary.byStatus).map(([status, count]) => ({ label: appointmentStatusNames[status] ?? status, value: count }))}
+              />
+              <PieChart
+                title="Servicios realizados"
+                format={formatTurns}
+                data={data.services.map((s) => ({ label: s.name, value: s.completed }))}
+              />
+            </div>
           </div>
 
           <div className="admin-section">

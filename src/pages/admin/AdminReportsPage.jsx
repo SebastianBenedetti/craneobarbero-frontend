@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ReportFilters, { IncomeBars, StatCard } from "../../components/ReportFilters/ReportFilters";
+import PieChart from "../../components/PieChart/PieChart";
 import Toast from "../../components/Toast/Toast";
 import { apiRequest } from "../../services/api";
 import {
@@ -12,7 +13,7 @@ import {
   getAdminSummary,
 } from "../../services/reports.services";
 import { currentMonthPeriod } from "../../utils/dates";
-import { formatMoney, formatPercent } from "../../utils/format";
+import { appointmentStatusNames, formatMoney, formatPercent, formatTurns } from "../../utils/format";
 import "../../styles/adminDashboard.css";
 import "../../styles/reports.css";
 
@@ -133,6 +134,34 @@ function AdminReportsPage() {
             <StatCard label="Ganancia de productos" value={formatMoney(products.profit)} hint={`Costo ${formatMoney(products.cost)}`} />
             <StatCard label="Turnos completados" value={appointments.completed}
               hint={`${appointments.byStatus.cancelled} cancelados · ${appointments.byStatus.expired} expirados`} />
+          </div>
+
+          <div className="admin-section">
+            <div className="admin-section-header">
+              <h2 className="admin-section-title">Distribución</h2>
+            </div>
+            <div className="report-pies">
+              <PieChart
+                title="Turnos por estado"
+                format={formatTurns}
+                data={Object.entries(appointments.byStatus).map(([status, count]) => ({ label: appointmentStatusNames[status] ?? status, value: count }))}
+              />
+              <PieChart
+                title="Origen de los ingresos"
+                format={formatMoney}
+                data={[{ label: "Turnos", value: appointments.income }, { label: "Productos", value: products.income }]}
+              />
+              <PieChart
+                title="Ingresos por sucursal"
+                format={formatMoney}
+                data={data.byBranch.map((b) => ({ label: b.name, value: b.totalIncome }))}
+              />
+              <PieChart
+                title="Servicios realizados"
+                format={formatTurns}
+                data={data.byService.map((s) => ({ label: s.name, value: s.completed }))}
+              />
+            </div>
           </div>
 
           <div className="admin-section">

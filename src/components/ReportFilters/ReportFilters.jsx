@@ -38,6 +38,13 @@ export function StatCard({ label, value, hint }) {
   );
 }
 
+const periodLabel = (period) => {
+  if (!/^\d{4}-\d{2}$/.test(period)) return period.split("-").reverse().join("/");
+  const [year, month] = period.split("-").map(Number);
+  const name = new Date(year, month - 1, 1).toLocaleDateString("es-AR", { month: "short", year: "numeric" });
+  return name.charAt(0).toUpperCase() + name.slice(1);
+};
+
 export function IncomeBars({ rows }) {
   const max = Math.max(...rows.map((r) => Number(r.totalIncome)), 0);
   if (rows.length === 0) return <p className="text-secondary">Sin datos en el período.</p>;
@@ -45,7 +52,7 @@ export function IncomeBars({ rows }) {
     <div className="report-bars" role="list">
       {rows.map((r) => (
         <div key={r.period} className="report-bar-row" role="listitem">
-          <span className="report-bar-label">{r.period}</span>
+          <span className="report-bar-label">{periodLabel(r.period)}</span>
           <div className="report-bar-track">
             <div className="report-bar-fill" style={{ width: max > 0 ? `${(Number(r.totalIncome) / max) * 100}%` : 0 }} />
           </div>

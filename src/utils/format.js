@@ -6,3 +6,13 @@ export const formatPercent = (value) =>
 
 export const formatDateTime = (value) =>
   new Date(value).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" });
+
+export const formatTurns = (value) => (Number(value) === 1 ? "1 turno" : `${Number(value ?? 0).toLocaleString("es-AR")} turnos`);
+
+export const appointmentStatusNames = {
+  awaiting_payment: "Esperando pago",
+  pending: "Pendiente",
+  completed: "Completado",
+  cancelled: "Cancelado",
+  expired: "Expirado",
+};
