@@ -21,6 +21,7 @@ import PaymentReturnPage from "../../pages/client/PaymentReturnPage";
 import AdminDashboardPage from "../../pages/admin/AdminDashboardPage";
 import AdminManagePage from "../../pages/admin/AdminManagePage";
 import AdminAgendaPage from "../../pages/admin/AdminAgendaPage";
+import AdminPricesPage from "../../pages/admin/AdminPricesPage";
 
 function AppRouter() {
   return (
@@ -62,6 +63,7 @@ function AppRouter() {
                 <Route index element={<AdminDashboardPage />} />
                 <Route path="manage" element={<AdminManagePage />} />
                 <Route path="agenda" element={<AdminAgendaPage />} />
+                <Route path="prices" element={<AdminPricesPage />} />
               </Route>
             </Route>
           </Route>

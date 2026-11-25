@@ -96,6 +96,9 @@ function Navbar() {
             <Link to="/admin/agenda" className={isActive("/admin/agenda")}>
               Agenda
             </Link>
+            <Link to="/admin/prices" className={isActive("/admin/prices")}>
+              Precios
+            </Link>
             <Link to="/admin/manage" className={isActive("/admin/manage")}>
               Gestionar
             </Link>
