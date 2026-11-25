@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { revertPriceAdjustment } from "../../../../services/prices.services";
 import ConfirmModal from "../../../../components/ConfirmModal/ConfirmModal";
-import { formatDateTime, formatMoney, formatPercent } from "./priceFormat";
+import { formatDateTime, formatMoney, formatPercent } from "../../../../utils/format";
 
 const ROUNDING_LABELS = { none: "sin redondeo", 10: "múltiplo de $10", 50: "múltiplo de $50", 100: "múltiplo de $100" };
 

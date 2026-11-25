@@ -22,6 +22,8 @@ import AdminDashboardPage from "../../pages/admin/AdminDashboardPage";
 import AdminManagePage from "../../pages/admin/AdminManagePage";
 import AdminAgendaPage from "../../pages/admin/AdminAgendaPage";
 import AdminPricesPage from "../../pages/admin/AdminPricesPage";
+import AdminReportsPage from "../../pages/admin/AdminReportsPage";
+import BarberReportsPage from "../../pages/barber/BarberReportsPage";
 
 function AppRouter() {
   return (
@@ -43,6 +45,7 @@ function AppRouter() {
                 <Route index element={<BarberDashboardPage />} />
                 <Route path="schedule" element={<BarberSchedulePage />} />
                 <Route path="clients" element={<BarberClientsPage />} />
+                <Route path="reports" element={<BarberReportsPage />} />
               </Route>
             </Route>
 
@@ -64,6 +67,7 @@ function AppRouter() {
                 <Route path="manage" element={<AdminManagePage />} />
                 <Route path="agenda" element={<AdminAgendaPage />} />
                 <Route path="prices" element={<AdminPricesPage />} />
+                <Route path="reports" element={<AdminReportsPage />} />
               </Route>
             </Route>
           </Route>

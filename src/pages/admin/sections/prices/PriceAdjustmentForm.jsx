@@ -7,7 +7,7 @@ import {
   previewPriceAdjustment,
 } from "../../../../services/prices.services";
 import ConfirmModal from "../../../../components/ConfirmModal/ConfirmModal";
-import { formatMoney, formatPercent } from "./priceFormat";
+import { formatMoney, formatPercent } from "../../../../utils/format";
 
 const ROUNDING_OPTIONS = [
   { value: "none", label: "Sin redondeo" },
