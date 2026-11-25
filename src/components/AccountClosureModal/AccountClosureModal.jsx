@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { formatMoney } from "../../utils/dates";
 import "../../styles/appointmentModal.css";
+import { backdropClose } from "../../utils/backdrop";
 
 const formatDateTime = (iso) =>
   new Date(iso).toLocaleString("es-AR", {
@@ -71,7 +72,7 @@ function AccountClosureModal({ mode, subjectName, loadPreview, onConfirm, onClos
   const notRefunded = preview ? preview.appointments.filter((a) => !a.refundable && a.paymentStatus === "paid") : [];
 
   return (
-    <div className="modal-overlay" onClick={() => !saving && onClose()}>
+    <div className="modal-overlay" {...backdropClose(() => !saving && onClose())}>
       <form
         className="modal-card"
         role="dialog"

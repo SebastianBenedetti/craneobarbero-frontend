@@ -8,6 +8,7 @@ import {
 import PaginationControls from "../../../components/PaginationControls/PaginationControls";
 import ConfirmModal from "../../../components/ConfirmModal/ConfirmModal";
 import Toast from "../../../components/Toast/Toast";
+import { backdropClose } from "../../../utils/backdrop";
 
 const EMPTY_FORM = { name: "", price: "", durationMinutes: "30", description: "" };
 
@@ -216,7 +217,7 @@ function ServicesSection() {
       )}
 
       {showForm && (
-        <div className="admin-modal-overlay" onClick={handleCloseForm}>
+        <div className="admin-modal-overlay" {...backdropClose(handleCloseForm)}>
           <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
             <h3 className="admin-modal-title">
               {editingCut ? "Editar servicio" : "Agregar servicio"}

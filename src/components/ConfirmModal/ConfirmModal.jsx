@@ -1,3 +1,5 @@
+import { backdropClose } from "../../utils/backdrop";
+
 // modal genérico de confirmación, lo usamos en lugar del window.confirm del navegador
 // recibe un título, un mensaje, y dos funciones: una para confirmar y otra para cancelar
 function ConfirmModal({
@@ -10,7 +12,7 @@ function ConfirmModal({
 }) {
   return (
     // si hacemos click fuera del cuadro se cancela
-    <div className="modal-overlay" onClick={onCancel}>
+    <div className="modal-overlay" {...backdropClose(onCancel)}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <h3 className="modal-title">{title}</h3>
 
