@@ -5,6 +5,7 @@ import Register from "../auth/Register";
 import { useAuth } from "../../context/AuthContext";
 import { bookAppointment, resendVerificationEmail } from "../../services/appointments.services";
 import { fromDateKey } from "../../utils/dates";
+import { backdropClose } from "../../utils/backdrop";
 
 function AppointmentForm({ branch, barber, day, hours, cut, branches, barbers, cuts }) {
   const { user, login } = useAuth();
@@ -138,7 +139,7 @@ function AppointmentForm({ branch, barber, day, hours, cut, branches, barbers, c
           <div
             className="modal show d-block"
             tabIndex="-1"
-            onClick={closeModal}
+            {...backdropClose(closeModal)}
           >
             <div
               className="modal-dialog modal-dialog-centered"

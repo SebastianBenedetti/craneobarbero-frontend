@@ -80,3 +80,8 @@ export const addMinutes = (time, minutes) => {
 };
 
 export const formatMoney = (value) => `$${Number(value ?? 0).toLocaleString("es-AR")}`;
+
+export const currentMonthPeriod = () => {
+  const today = todayKey();
+  return { from: `${today.slice(0, 7)}-01`, to: today };
+};

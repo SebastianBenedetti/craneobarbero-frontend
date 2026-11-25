@@ -1,5 +1,6 @@
 import "../../styles/appointmentModal.css";
 import AppointmentStatusBadge from "../AppointmentStatusBadge/AppointmentStatusBadge";
+import { backdropClose } from "../../utils/backdrop";
 
 const CANCELLATION_REASONS = {
   schedule_removed: "Se eliminaron los horarios de la agenda",
@@ -22,7 +23,7 @@ function AppointmentModal({ appointment, onClose }) {
   const time = date.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false });
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" {...backdropClose(onClose)}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <h3 className="modal-title">Detalle del turno</h3>
         <div className="modal-row"><span className="modal-label">Día:</span><span>{day}</span></div>

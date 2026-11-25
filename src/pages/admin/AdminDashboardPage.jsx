@@ -4,6 +4,8 @@ import { useAuth } from "../../context/AuthContext";
 import { getAllAppointmentsAdminService } from "../../services/admin.services";
 import { getAllUsersService } from "../../services/admin.services";
 import { getAllBranchesAdminService } from "../../services/admin.services";
+import { getAdminSummary } from "../../services/reports.services";
+import { todayKey, addDays, monthRange } from "../../utils/dates";
 import "../../styles/adminDashboard.css";
 
 // pagina de inicio del admin con estadisticas generales del negocio
@@ -74,10 +76,17 @@ function AdminDashboardPage() {
     ),
   ].sort().reverse();
 
-  // sumamos el precio de cada turno completado para calcular lo facturado
-  const totalRevenue = filteredAppointments
-    .filter((a) => a.paymentStatus === "paid" && a.price != null)
-    .reduce((sum, a) => sum + Number(a.price), 0);
+  // lo facturado lo calcula el servidor con las reglas de ingreso (turnos y productos)
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  useEffect(() => {
+    const today = todayKey();
+    const period = statsMonth
+      ? monthRange(Number(statsMonth.slice(0, 4)), Number(statsMonth.slice(5, 7)) - 1)
+      : { from: addDays(today, -730), to: today };
+    getAdminSummary(period)
+      .then((summary) => setTotalRevenue(Number(summary.totalIncome)))
+      .catch(() => setTotalRevenue(0));
+  }, [statsMonth]);
 
   // solo contamos los usuarios con rol "client", los admin no se incluyen
   const totalClients = users.filter((u) => u.role === "client").length;

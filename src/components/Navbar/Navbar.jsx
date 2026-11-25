@@ -84,6 +84,9 @@ function Navbar() {
             <Link to="/barber/clients" className={isActive("/barber/clients")}>
               Mis clientes
             </Link>
+            <Link to="/barber/reports" className={isActive("/barber/reports")}>
+              Mis reportes
+            </Link>
           </>
         )}
 
@@ -95,6 +98,12 @@ function Navbar() {
             </Link>
             <Link to="/admin/agenda" className={isActive("/admin/agenda")}>
               Agenda
+            </Link>
+            <Link to="/admin/prices" className={isActive("/admin/prices")}>
+              Precios
+            </Link>
+            <Link to="/admin/reports" className={isActive("/admin/reports")}>
+              Reportes
             </Link>
             <Link to="/admin/manage" className={isActive("/admin/manage")}>
               Gestionar

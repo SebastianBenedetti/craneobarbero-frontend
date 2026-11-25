@@ -9,6 +9,8 @@ import { getAllBranchesAdminService } from "../../../services/admin.services";
 import PaginationControls from "../../../components/PaginationControls/PaginationControls";
 import ConfirmModal from "../../../components/ConfirmModal/ConfirmModal";
 import Toast from "../../../components/Toast/Toast";
+import { IMAGE_URL_HINT, IMAGE_URL_PATTERN } from "../../../utils/image";
+import { backdropClose } from "../../../utils/backdrop";
 
 const EMPTY_FORM = {
   name: "",
@@ -285,7 +287,7 @@ function BarbersSection() {
       )}
 
       {showForm && (
-        <div className="admin-modal-overlay" onClick={handleCloseForm}>
+        <div className="admin-modal-overlay" {...backdropClose(handleCloseForm)}>
           <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
             <h3 className="admin-modal-title">
               {editingBarber ? "Editar barbero" : "Agregar barbero"}
@@ -387,7 +389,7 @@ function BarbersSection() {
                 <label htmlFor="barber-image" className="admin-form-label">Foto</label>
                 <input
                   id="barber-image"
-                  type="url"
+                  type="text" inputMode="url" pattern={IMAGE_URL_PATTERN} title={IMAGE_URL_HINT}
                   name="imageUrl"
                   placeholder="URL de la foto (opcional)"
                   value={form.imageUrl}

@@ -10,9 +10,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1.5rem;
 }
 
 .navbar-title {
+  white-space: nowrap;
   color: var(--accent-primary);
   font-size: 1.7rem;
   font-weight: 700;
@@ -27,6 +29,7 @@
 
 /* los <a> tienen subrayado por defecto asi que lo sacamos con text-decoration none*/
 .navbar-links a {
+  white-space: nowrap;
   color: var(--text-primary);
   text-decoration: none;
   transition: color 0.2s ease; 
@@ -172,6 +175,8 @@
 
 /* Etiqueta del panel de barbero */
 .navbar-panel-label {
+  margin-right: -1.25rem;
+  white-space: nowrap;
   color: var(--accent-primary);
   font-size: 0.75rem;
   font-weight: 600;
@@ -247,9 +252,33 @@
 }
 
 /* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .custom-navbar {
+    padding: 1rem 1.5rem;
+  }
+
+  .navbar-title {
+    font-size: 1.4rem;
+  }
+
+  .navbar-links {
+    gap: 1.25rem;
+  }
+
+  .navbar-panel-label {
+    margin-right: -0.6rem;
+  }
+}
+
+@media (max-width: 991.98px) {
   .custom-navbar {
     padding: 1rem 1.25rem;
+  }
+
+  .navbar-panel-label {
+    align-self: flex-start;
+    margin-right: 0;
+    padding-top: 4px;
   }
 
   .navbar-title {

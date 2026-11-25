@@ -15,6 +15,7 @@ import {
 } from "../../../services/users.services";
 import { formatMoney } from "../../../utils/dates";
 import { isStrongPassword, PASSWORD_POLICY } from "../../../utils/password";
+import { backdropClose } from "../../../utils/backdrop";
 
 const INPUT = "form-control bg-secondary text-white border-secondary";
 const EMPTY_FORM = { name: "", email: "", password: "", phone: "" };
@@ -66,7 +67,7 @@ function UserFormModal({ role, user, onClose, onSaved }) {
   };
 
   return (
-    <div className="admin-modal-overlay" onClick={onClose}>
+    <div className="admin-modal-overlay" {...backdropClose(onClose)}>
       <div className="admin-modal" role="dialog" aria-modal="true" aria-labelledby="user-form-title" onClick={(e) => e.stopPropagation()}>
         <h3 className="admin-modal-title" id="user-form-title">
           {user ? `Editar ${labels.singular}` : `Agregar ${labels.singular}`}

@@ -1,0 +1,75 @@
+.prices-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.prices-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 200, 49, 0.3);
+  border-radius: 10px;
+  padding: 16px;
+  margin: 0;
+  min-width: 0;
+}
+
+.prices-card legend {
+  float: none;
+  width: auto;
+  padding: 0 6px;
+  margin-bottom: 8px;
+}
+
+.prices-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.prices-option input {
+  accent-color: var(--accent-primary);
+}
+
+.prices-product-list {
+  max-height: 220px;
+  overflow-y: auto;
+  margin-top: 8px;
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.prices-period {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.prices-period button {
+  grid-column: 1 / -1;
+}
+
+.prices-suggestion {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin: 4px 0 12px;
+}
+
+.prices-preview,
+.prices-revert-result {
+  margin-top: 20px;
+  padding: 16px;
+  background: var(--bg-card);
+  border-radius: 10px;
+}
+
+@media (max-width: 576px) {
+  .prices-card {
+    padding: 12px;
+  }
+}

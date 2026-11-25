@@ -4,6 +4,7 @@ import { PAYMENT_METHODS, createManualAppointment, getAvailableTimes, searchClie
 import { todayKey } from "../../utils/dates";
 import "../../styles/appointmentModal.css";
 import "../../styles/calendar.css";
+import { backdropClose } from "../../utils/backdrop";
 
 const MIN_SEARCH = 3;
 
@@ -87,7 +88,7 @@ function NewAppointmentModal({ barbers, fixedBarber, onClose, onCreated }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" {...backdropClose(onClose)}>
       <div className="modal-card modal-card-wide" role="dialog" aria-modal="true" aria-labelledby="new-title" onClick={(e) => e.stopPropagation()}>
         <h3 className="modal-title" id="new-title">Nuevo turno</h3>
 

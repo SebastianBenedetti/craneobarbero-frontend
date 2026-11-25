@@ -3,6 +3,7 @@ import { PAYMENT_METHODS, getAvailableTimes, rescheduleAppointment } from "../..
 import { addDays, toDateKey, todayKey } from "../../utils/dates";
 import "../../styles/appointmentModal.css";
 import "../../styles/calendar.css";
+import { backdropClose } from "../../utils/backdrop";
 
 const BOOKING_WINDOW_DAYS = 60;
 
@@ -55,7 +56,7 @@ function AppointmentEditModal({ appointment, staff = false, onClose, onSaved }) 
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" {...backdropClose(onClose)}>
       <div className="modal-card" role="dialog" aria-modal="true" aria-labelledby="edit-title" onClick={(e) => e.stopPropagation()}>
         <h3 className="modal-title" id="edit-title">Modificar turno</h3>
 

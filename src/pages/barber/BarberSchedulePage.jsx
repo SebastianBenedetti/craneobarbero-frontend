@@ -11,6 +11,7 @@ import PaginationControls from "../../components/PaginationControls/PaginationCo
 import "../../styles/barberDashboard.css";
 import "../../styles/barberSchedule.css";
 import "../../styles/appointmentModal.css";
+import { backdropClose } from "../../utils/backdrop";
 
 function BarberSchedulePage() {
   const { user } = useAuth();
@@ -127,7 +128,7 @@ function BarberSchedulePage() {
 
       {/* modal del selector de rango de fechas */}
       {showDateModal && (
-        <div className="modal-overlay" onClick={() => setShowDateModal(false)}>
+        <div className="modal-overlay" {...backdropClose(() => setShowDateModal(false))}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
             <h3 className="modal-title">Seleccionar rango de días</h3>
 

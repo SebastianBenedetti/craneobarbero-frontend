@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { cancelAppointment, getCancellationPreview } from "../../services/appointments.services";
 import "../../styles/appointmentModal.css";
+import { backdropClose } from "../../utils/backdrop";
 
 const money = (value) => `$${Number(value ?? 0).toLocaleString("es-AR")}`;
 
@@ -37,7 +38,7 @@ function CancelAppointmentModal({ appointment, askReason = false, onClose, onCan
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" {...backdropClose(onClose)}>
       <div className="modal-card" role="dialog" aria-modal="true" aria-labelledby="cancel-title" onClick={(e) => e.stopPropagation()}>
         <h3 className="modal-title" id="cancel-title">Cancelar turno</h3>
 
