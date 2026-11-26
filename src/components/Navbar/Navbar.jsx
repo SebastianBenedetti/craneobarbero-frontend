@@ -72,11 +72,6 @@ function Navbar() {
                 <span className="navbar-cart-count" aria-label={`${cartCount} productos en el carrito`}>{cartCount}</span>
               )}
             </Link>
-            {user && (
-              <Link to="/my-account/purchases" className={isActive("/my-account/purchases")}>
-                Mis compras
-              </Link>
-            )}
             <Link to="/about">Nosotros</Link>
           </>
         )}
@@ -188,6 +183,9 @@ function Navbar() {
               <div className="navbar-dropdown">
                 <Link to="/my-account/appointments" onClick={closeAll}>
                   Mis turnos
+                </Link>
+                <Link to="/my-account/purchases" onClick={closeAll}>
+                  Mis compras
                 </Link>
                 <Link to="/my-account" onClick={closeAll}>
                   Mi cuenta

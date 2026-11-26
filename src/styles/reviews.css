@@ -118,11 +118,19 @@
 }
 
 .review-mine {
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.review-mine-ratings {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 4px 14px;
-  margin-top: 8px;
-  color: var(--text-secondary);
-  font-size: 0.82rem;
+}
+
+.review-mine-comment {
+  margin-top: 4px;
+  overflow-wrap: anywhere;
 }

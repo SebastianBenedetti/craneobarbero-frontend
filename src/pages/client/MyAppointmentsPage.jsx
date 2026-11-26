@@ -230,9 +230,14 @@ function MyAppointmentsPage() {
                 </div>
                 {appointment.status === "completed" && (reviews[appointment.id] ? (
                   <div className="review-mine">
-                    <span>Tu calificación:</span>
-                    <span>Barbero <StarDisplay value={reviews[appointment.id].ratingBarber} size="0.9rem" /></span>
-                    <span>Servicio <StarDisplay value={reviews[appointment.id].ratingCut} size="0.9rem" /></span>
+                    <div className="review-mine-ratings">
+                      <span>Tu calificación:</span>
+                      <span>Barbero <StarDisplay value={reviews[appointment.id].ratingBarber} size="0.9rem" /></span>
+                      <span>Servicio <StarDisplay value={reviews[appointment.id].ratingCut} size="0.9rem" /></span>
+                    </div>
+                    <div className="review-mine-comment">
+                      Comentario: <span className="text-light">{reviews[appointment.id].comment ?? ""}</span>
+                    </div>
                   </div>
                 ) : (
                   <div className="mt-2">

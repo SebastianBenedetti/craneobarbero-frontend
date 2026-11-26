@@ -358,6 +358,21 @@
     animation: none;
   }
 
+  .navbar-links .navbar-dropdown a {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .navbar-links .navbar-dropdown a:last-of-type {
+    border-bottom: none;
+  }
+
+  .navbar-dropdown-logout {
+    font-size: 0.95rem;
+    padding: 12px 20px;
+  }
+
   .navbar-barber-session {
     flex-direction: row;
     flex-wrap: wrap;
