@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import { AuthProvider } from "../../context/AuthContext";
+import { CartProvider } from "../../context/CartProvider";
 import ScrollToTop from "../ScrollToTop/ScrollToTop";
 import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 import Layout from "../Layout/Layout";
@@ -24,56 +25,64 @@ import AdminAgendaPage from "../../pages/admin/AdminAgendaPage";
 import AdminPricesPage from "../../pages/admin/AdminPricesPage";
 import AdminReportsPage from "../../pages/admin/AdminReportsPage";
 import BarberReportsPage from "../../pages/barber/BarberReportsPage";
+import AdminStorePage from "../../pages/admin/AdminStorePage";
+import ShopPage from "../../pages/client/ShopPage";
+import MyPurchasesPage from "../../pages/client/MyPurchasesPage";
 
 function AppRouter() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ScrollToTop />
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/appointment" element={<AppointmentPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/verify-email" element={<VerifyEmailPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <CartProvider>
+          <ScrollToTop />
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/appointment" element={<AppointmentPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/verify-email" element={<VerifyEmailPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-            <Route element={<ProtectedRoute roles={["barber"]} />}>
-              <Route path="/barber">
-                <Route index element={<BarberDashboardPage />} />
-                <Route path="schedule" element={<BarberSchedulePage />} />
-                <Route path="clients" element={<BarberClientsPage />} />
-                <Route path="reports" element={<BarberReportsPage />} />
+              <Route element={<ProtectedRoute roles={["barber"]} />}>
+                <Route path="/barber">
+                  <Route index element={<BarberDashboardPage />} />
+                  <Route path="schedule" element={<BarberSchedulePage />} />
+                  <Route path="clients" element={<BarberClientsPage />} />
+                  <Route path="reports" element={<BarberReportsPage />} />
+                </Route>
+              </Route>
+
+              <Route element={<ProtectedRoute roles={["client"]} />}>
+                <Route path="/payments/return" element={<PaymentReturnPage />} />
+                <Route path="/my-account/appointments" element={<MyAppointmentsPage />} />
+                <Route path="/my-account/purchases" element={<MyPurchasesPage />} />
+                <Route path="/shop" element={<ShopPage />} />
+              </Route>
+
+              <Route element={<ProtectedRoute />}>
+                <Route path="/my-account">
+                  <Route index element={<MyAccountPage />} />
+                  <Route path="change-password" element={<Navigate to="/my-account" replace />} />
+                </Route>
+              </Route>
+
+              <Route element={<ProtectedRoute roles={["admin"]} />}>
+                <Route path="/admin">
+                  <Route index element={<AdminDashboardPage />} />
+                  <Route path="manage" element={<AdminManagePage />} />
+                  <Route path="agenda" element={<AdminAgendaPage />} />
+                  <Route path="prices" element={<AdminPricesPage />} />
+                  <Route path="reports" element={<AdminReportsPage />} />
+                  <Route path="store" element={<AdminStorePage />} />
+                </Route>
               </Route>
             </Route>
 
-            <Route element={<ProtectedRoute roles={["client"]} />}>
-              <Route path="/payments/return" element={<PaymentReturnPage />} />
-              <Route path="/my-account/appointments" element={<MyAppointmentsPage />} />
-            </Route>
-
-            <Route element={<ProtectedRoute />}>
-              <Route path="/my-account">
-                <Route index element={<MyAccountPage />} />
-                <Route path="change-password" element={<Navigate to="/my-account" replace />} />
-              </Route>
-            </Route>
-
-            <Route element={<ProtectedRoute roles={["admin"]} />}>
-              <Route path="/admin">
-                <Route index element={<AdminDashboardPage />} />
-                <Route path="manage" element={<AdminManagePage />} />
-                <Route path="agenda" element={<AdminAgendaPage />} />
-                <Route path="prices" element={<AdminPricesPage />} />
-                <Route path="reports" element={<AdminReportsPage />} />
-              </Route>
-            </Route>
-          </Route>
-
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </CartProvider>
       </AuthProvider>
     </BrowserRouter>
   );
