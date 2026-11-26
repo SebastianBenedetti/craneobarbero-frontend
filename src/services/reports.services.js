@@ -57,9 +57,9 @@ async function downloadFile(path, params, fallbackName) {
 }
 
 export const downloadAdminReport = (format, params) =>
-  downloadFile("/reports/admin/export", { ...params, format }, `reporte.${format}`);
+  downloadFile("/reports/admin/export", { ...params, format }, `Reporte - Craneo Barbero.${format}`);
 
 export async function downloadAiReport(params) {
-  const headers = await downloadFile("/reports/admin/ai-report", params, "Reporte mensual Cráneo Barbero.pdf");
+  const headers = await downloadFile("/reports/admin/ai-report", params, "Reporte - Craneo Barbero.pdf");
   return headers.get("X-Report-Ai") === "true";
 }
