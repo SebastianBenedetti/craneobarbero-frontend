@@ -2,6 +2,7 @@ import "../../styles/layout.css";
 import { useLocation, useNavigate, Outlet } from "react-router";
 import Navbar from "../Navbar/Navbar";
 import Footer from "../Footer/Footer";
+import BookingAssistant from "../BookingAssistant/BookingAssistant";
 import { useAuth } from "../../context/AuthContext";
 
 function Layout() {
@@ -31,6 +32,7 @@ function Layout() {
           <i className="ti ti-scissors" />
         </button>
       )}
+      {user?.role === "client" && <BookingAssistant key={user.id} bottomOffset={showFab} />}
     </div>
   );
 }
