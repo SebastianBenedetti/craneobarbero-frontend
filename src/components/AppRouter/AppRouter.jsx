@@ -43,6 +43,7 @@ function AppRouter() {
               <Route path="/about" element={<AboutPage />} />
               <Route path="/appointment" element={<AppointmentPage />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/shop" element={<ShopPage />} />
               <Route path="/verify-email" element={<VerifyEmailPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -63,7 +64,6 @@ function AppRouter() {
                 <Route path="/payments/return" element={<PaymentReturnPage />} />
                 <Route path="/my-account/appointments" element={<MyAppointmentsPage />} />
                 <Route path="/my-account/purchases" element={<MyPurchasesPage />} />
-                <Route path="/shop" element={<ShopPage />} />
               </Route>
 
               <Route element={<ProtectedRoute />}>
