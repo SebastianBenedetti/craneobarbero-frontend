@@ -1,18 +1,32 @@
 import "../../styles/home.css";
 import "../../styles/animations.css";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 import { useAuth } from "../../hooks/useAuth";
+import { getCategories } from "../../services/store.services";
 
 const PANEL_BY_ROLE = { admin: "/admin", barber: "/barber" };
 
 function HomePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [categories, setCategories] = useState([]);
   useEffect(() => {
     document.title = " Inicio | Cráneo Barbero";
   }, []);
+
+  useEffect(() => {
+    getCategories()
+      .then(setCategories)
+      .catch(() => setCategories([]));
+  }, []);
+
+  const goToShop = (categoryId) => {
+    const target = categoryId ? `/shop?category=${categoryId}` : "/shop";
+    if (user) navigate(target);
+    else navigate("/login", { state: { from: target } });
+  };
 
   const panel = PANEL_BY_ROLE[user?.role];
   if (panel) {
@@ -46,6 +60,33 @@ function HomePage() {
             <i className="ti ti-scissors"></i>
             Sacar turno ahora
           </button>
+        </div>
+
+        <div className="home-divider" aria-hidden="true" />
+
+        <div className="hero-cta home-store">
+          <h2 className="hero-cta-title">Nuestra tienda</h2>
+          <p className="hero-cta-subtitle">
+            Seleccionados entre los mejores productos del mercado
+          </p>
+          <button className="btn-cta" onClick={() => goToShop()}>
+            <i className="ti ti-shopping-bag"></i>
+            Visitar la tienda
+          </button>
+          {categories.length > 0 && (
+            <div className="home-store-categories">
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  type="button"
+                  className="home-store-chip"
+                  onClick={() => goToShop(category.id)}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>

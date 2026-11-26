@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 import { useAuth } from "../../hooks/useAuth";
 import Toast from "../../components/Toast/Toast";
 import AccountClosureModal from "../../components/AccountClosureModal/AccountClosureModal";
@@ -117,7 +116,6 @@ function PasswordForm({ onSaved }) {
 
 function MyAccountPage() {
   const { logout } = useAuth();
-  const navigate = useNavigate();
   const [me, setMe] = useState(null);
   const [loadError, setLoadError] = useState("");
   const [toast, setToast] = useState(null);
@@ -147,7 +145,7 @@ function MyAccountPage() {
     if (closing === "delete") await deleteMyAccount(password);
     else await deactivateMyAccount(password);
     logout();
-    navigate("/", { replace: true });
+    window.location.replace("/");
   };
 
   if (loadError) {

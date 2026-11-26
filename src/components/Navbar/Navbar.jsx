@@ -1,5 +1,5 @@
 import "../../styles/navbar.css";
-import { Link, useNavigate, useLocation } from "react-router";
+import { Link, useLocation } from "react-router";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import useCart from "../../hooks/useCart";
@@ -10,7 +10,6 @@ function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const navigate = useNavigate();
   const location = useLocation();
   const isActive = (path) =>
     location.pathname === path ? "navbar-link-active" : "";
@@ -25,6 +24,11 @@ function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    document.body.classList.toggle("nav-menu-open", menuOpen);
+    return () => document.body.classList.remove("nav-menu-open");
+  }, [menuOpen]);
+
   const [lastPath, setLastPath] = useState(location.pathname);
   if (lastPath !== location.pathname) {
     setLastPath(location.pathname);
@@ -34,9 +38,7 @@ function Navbar() {
 
   const handleLogout = () => {
     logout();
-    setDropdownOpen(false);
-    setMenuOpen(false);
-    navigate("/");
+    window.location.assign("/");
   };
 
   const closeAll = () => {

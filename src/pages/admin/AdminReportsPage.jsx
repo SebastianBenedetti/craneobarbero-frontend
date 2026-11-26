@@ -45,18 +45,9 @@ function ReportTable({ title, headers, rows, empty = "Sin datos en el período."
   );
 }
 
-const MONTHS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
-
 function periodLabel(from, to) {
-  const [fy, fm] = from.split("-").map(Number);
-  const [ty, tm] = to.split("-").map(Number);
-  const month = (y, m) => `${MONTHS[m - 1]} ${y}`;
-  if (fy === ty && fm === tm) {
-    const text = month(ty, tm);
-    return text.charAt(0).toUpperCase() + text.slice(1);
-  }
-  const day = (value) => value.split("-").reverse().join("/");
-  return `Del ${day(from)} al ${day(to)}`;
+  const month = (value) => value.slice(5, 7) + "-" + value.slice(0, 4);
+  return from.slice(0, 7) === to.slice(0, 7) ? month(to) : `${month(from)} a ${month(to)}`;
 }
 
 function AdminReportsPage() {
@@ -135,7 +126,7 @@ function AdminReportsPage() {
       const label = periodLabel(filters.from, filters.to);
       await shareSummaryImage({
         periodLabel: label,
-        fileName: `Cráneo Barbero ${filters.from.slice(0, 7)}.png`,
+        fileName: `Reporte ${label} - Craneo Barbero.png`,
         stats: [
           { value: String(data.summary.appointments.completed), label: "cortes realizados" },
           { value: top && top.completed > 0 ? top.name : "-", label: "el servicio más elegido" },
