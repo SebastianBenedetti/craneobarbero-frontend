@@ -306,7 +306,7 @@
   .navbar-links {
     display: none;
     position: fixed;
-    top: 61px;
+    top: calc(100% + 1px);
     left: 0;
     right: 0;
     background-color: rgba(13, 13, 13, 0.97);
