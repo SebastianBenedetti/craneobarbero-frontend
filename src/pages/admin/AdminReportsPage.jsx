@@ -5,6 +5,7 @@ import Toast from "../../components/Toast/Toast";
 import { apiRequest } from "../../services/api";
 import {
   downloadAdminReport,
+  downloadAiReport,
   getAdminBarbers,
   getAdminBranches,
   getAdminPeriods,
@@ -13,6 +14,7 @@ import {
   getAdminSummary,
 } from "../../services/reports.services";
 import { currentMonthPeriod } from "../../utils/dates";
+import { shareSummaryImage } from "../../utils/shareImage";
 import { appointmentStatusNames, formatMoney, formatPercent, formatTurns } from "../../utils/format";
 import "../../styles/adminDashboard.css";
 import "../../styles/reports.css";
@@ -41,6 +43,20 @@ function ReportTable({ title, headers, rows, empty = "Sin datos en el período."
       </div>
     </div>
   );
+}
+
+const MONTHS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+
+function periodLabel(from, to) {
+  const [fy, fm] = from.split("-").map(Number);
+  const [ty, tm] = to.split("-").map(Number);
+  const month = (y, m) => `${MONTHS[m - 1]} ${y}`;
+  if (fy === ty && fm === tm) {
+    const text = month(ty, tm);
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+  const day = (value) => value.split("-").reverse().join("/");
+  return `Del ${day(from)} al ${day(to)}`;
 }
 
 function AdminReportsPage() {
@@ -97,6 +113,42 @@ function AdminReportsPage() {
     }
   };
 
+  const downloadAi = async () => {
+    setDownloading("ai");
+    try {
+      const aiGenerated = await downloadAiReport(filters);
+      setToast(aiGenerated
+        ? { message: "Reporte con IA generado.", type: "success" }
+        : { message: "La IA no estaba disponible: el reporte se armó con recomendaciones automáticas.", type: "warning" });
+    } catch (err) {
+      setToast({ message: err.message, type: "danger" });
+    } finally {
+      setDownloading("");
+    }
+  };
+
+  const shareImage = async () => {
+    if (!data) return;
+    setDownloading("image");
+    try {
+      const top = [...data.byService].sort((a, b) => b.completed - a.completed)[0];
+      const label = periodLabel(filters.from, filters.to);
+      await shareSummaryImage({
+        periodLabel: label,
+        fileName: `Cráneo Barbero ${filters.from.slice(0, 7)}.png`,
+        stats: [
+          { value: String(data.summary.appointments.completed), label: "cortes realizados" },
+          { value: top && top.completed > 0 ? top.name : "-", label: "el servicio más elegido" },
+          { value: String(data.summary.products.units), label: "productos vendidos" },
+        ],
+      });
+    } catch (err) {
+      setToast({ message: err.message, type: "danger" });
+    } finally {
+      setDownloading("");
+    }
+  };
+
   const summary = data?.summary;
   const appointments = summary?.appointments;
   const products = summary?.products;
@@ -110,11 +162,19 @@ function AdminReportsPage() {
 
       <ReportFilters value={filters} onChange={changeFilters} branches={branches}>
         <div className="report-actions">
+          <button type="button" className="btn btn-warning text-dark" disabled={!!downloading} onClick={downloadAi}
+            title="Análisis con estrategias y reseñas (máximo dos años)">
+            <i className="ti ti-sparkles" aria-hidden="true" /> {downloading === "ai" ? "Analizando..." : "Reporte con IA"}
+          </button>
           <button type="button" className="btn btn-outline-warning" disabled={!!downloading} onClick={() => download("pdf")}>
             {downloading === "pdf" ? "Generando..." : "Exportar PDF"}
           </button>
           <button type="button" className="btn btn-outline-warning" disabled={!!downloading} onClick={() => download("xlsx")}>
             {downloading === "xlsx" ? "Generando..." : "Exportar Excel"}
+          </button>
+          <button type="button" className="btn btn-outline-warning" disabled={!!downloading || !data} onClick={shareImage}
+            title="Imagen para compartir" aria-label="Imagen para compartir">
+            {downloading === "image" ? "Generando..." : "Imagen"} <i className="ti ti-share" aria-hidden="true" />
           </button>
         </div>
       </ReportFilters>
