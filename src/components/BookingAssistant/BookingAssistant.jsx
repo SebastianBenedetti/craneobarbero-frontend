@@ -163,7 +163,14 @@ function BookingAssistant({ bottomOffset = false }) {
           aria-label="Abrir el asistente de reservas"
           title="Asistente de reservas"
         >
-          <span aria-hidden="true">{AVATAR}</span>
+          <span className="assistant-fab-label" aria-hidden="true">
+            Asistente de
+            <br />
+            Cráneo Barbero
+          </span>
+          <span className="assistant-fab-icon" aria-hidden="true">
+            {AVATAR}
+          </span>
         </button>
       )}
 
