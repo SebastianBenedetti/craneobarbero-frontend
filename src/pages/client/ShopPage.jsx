@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
+import { useAuth } from "../../hooks/useAuth";
 import useCart from "../../hooks/useCart";
 import useBranches from "../../hooks/useBranches";
 import { MAX_CART_PRODUCTS, MAX_CART_QUANTITY } from "../../context/CartProvider";
@@ -10,6 +11,9 @@ import "../../styles/store.css";
 
 function ShopPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
+  const canBuy = user?.role === "client";
   const [searchParams] = useSearchParams();
   const focusedId = Number(searchParams.get("product")) || null;
   const cart = useCart();
@@ -66,7 +70,15 @@ function ShopPage() {
     return !loading && (!product || !product.inStock);
   });
 
+  const goToLogin = (view) => {
+    navigate("/login", { state: { from: `${location.pathname}${location.search}`, view } });
+  };
+
   const add = (product) => {
+    if (!user) {
+      goToLogin();
+      return;
+    }
     cart.addItem(product);
     setAdded(product.id);
     setCheckoutError(null);
@@ -159,7 +171,7 @@ function ShopPage() {
                     {product.description && <p className="shop-card-description">{product.description}</p>}
                     <div className="shop-card-footer">
                       <span className="shop-card-price">{formatMoney(product.salePrice)}</span>
-                      {product.inStock ? (
+                      {user && !canBuy ? null : product.inStock ? (
                         <button
                           className="btn btn-warning text-dark btn-sm"
                           onClick={() => add(product)}
@@ -180,9 +192,17 @@ function ShopPage() {
         </section>
 
         <aside className="shop-cart" aria-label="Carrito">
-          <h2 className="shop-cart-title">Tu carrito {cart.count > 0 && <span className="text-secondary">({cart.count})</span>}</h2>
+          <h2 className="shop-cart-title">Tu carrito {canBuy && cart.count > 0 && <span className="text-secondary">({cart.count})</span>}</h2>
 
-          {cart.items.length === 0 ? (
+          {!user ? (
+            <>
+              <p className="text-secondary">Para comprar tenés que iniciar sesión.</p>
+              <button className="btn btn-warning text-dark w-100" onClick={() => goToLogin()}>Iniciar sesión</button>
+              <button className="btn btn-outline-light w-100 mt-2" onClick={() => goToLogin("register")}>Crear cuenta</button>
+            </>
+          ) : !canBuy ? (
+            <p className="text-secondary mb-0">Las compras online son solo para clientes.</p>
+          ) : cart.items.length === 0 ? (
             <p className="text-secondary mb-0">Todavía no agregaste productos.</p>
           ) : (
             <>

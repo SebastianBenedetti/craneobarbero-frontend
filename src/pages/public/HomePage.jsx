@@ -23,9 +23,7 @@ function HomePage() {
   }, []);
 
   const goToShop = (categoryId) => {
-    const target = categoryId ? `/shop?category=${categoryId}` : "/shop";
-    if (user) navigate(target);
-    else navigate("/login", { state: { from: target } });
+    navigate(categoryId ? `/shop?category=${categoryId}` : "/shop");
   };
 
   const panel = PANEL_BY_ROLE[user?.role];
