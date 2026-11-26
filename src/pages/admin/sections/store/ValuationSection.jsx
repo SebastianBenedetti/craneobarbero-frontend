@@ -33,7 +33,7 @@ function ValuationSection() {
           <span className="admin-stat-label">Valor a precio de venta</span>
         </div>
         <div className="admin-stat-card">
-          <span className="admin-stat-value">{formatMoney(data.totalSaleValue - data.totalCostValue)}</span>
+          <span className="admin-stat-value text-light">{formatMoney(data.totalSaleValue - data.totalCostValue)}</span>
           <span className="admin-stat-label">Ganancia potencial</span>
         </div>
       </section>

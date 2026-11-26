@@ -357,6 +357,7 @@
 
 .shop-card-image {
   aspect-ratio: 4 / 3;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
