@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main, seba-branch, rafa-branch, gera-branch]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Lint y compilación
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Compilar
+        run: npm run build
+        env:
+          VITE_API_URL: https://example.invalid

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import { CartContext } from "./cartContext";
 
 export const MAX_CART_QUANTITY = 100;

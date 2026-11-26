@@ -6,7 +6,9 @@
 //   onRegister(token) → callback que ejecuta el padre cuando el registro fue exitoso (recibe el JWT)
 //   onCancel()        → callback para cerrar el formulario o volver al login
 
+import "../../styles/legal.css";
 import { useRef, useState } from "react";
+import { Link } from "react-router";
 import { registerService } from "./auth.services";
 import { isStrongPassword, PASSWORD_POLICY } from "../../utils/password";
 
@@ -15,8 +17,9 @@ const Register = ({ onRegister, onCancel }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [acceptTerms, setAcceptTerms] = useState(false);
     // errores por campo para mostrar mensajes de validación debajo de cada input
-    const [error, setErrors] = useState({ name: false, email: false, password: false, confirmPassword: false });
+    const [error, setErrors] = useState({ name: false, email: false, password: false, confirmPassword: false, terms: false });
     // error que viene del servidor (email duplicado, validación de Sequelize, etc.)
     const [serverError, setServerError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -57,12 +60,17 @@ const Register = ({ onRegister, onCancel }) => {
             confirmPasswordRef.current.focus();
             return;
         }
+        if (!acceptTerms) {
+            setErrors({ ...error, terms: true });
+            return;
+        }
 
         setLoading(true);
         registerService(
             name,
             email,
             password,
+            acceptTerms,
             (data) => {
                 setLoading(false);
                 onRegister(data.token); // el backend devuelve un JWT listo para usar
@@ -148,6 +156,27 @@ const Register = ({ onRegister, onCancel }) => {
                 {error.confirmPassword && (
                     <p className="text-danger" style={{ fontSize: "13px", marginTop: "4px" }}>
                         Las contraseñas no coinciden.
+                    </p>
+                )}
+            </div>
+
+            <div className="mb-4">
+                <label className="terms-check">
+                    <input
+                        type="checkbox"
+                        checked={acceptTerms}
+                        onChange={(e) => { setAcceptTerms(e.target.checked); clearError("terms"); }}
+                    />
+                    <span>
+                        Leí y acepto los{" "}
+                        <Link to="/terms" target="_blank" rel="noopener noreferrer">términos y condiciones</Link>{" "}
+                        y la{" "}
+                        <Link to="/privacy" target="_blank" rel="noopener noreferrer">política de privacidad</Link>.
+                    </span>
+                </label>
+                {error.terms && (
+                    <p className="text-danger" style={{ fontSize: "13px", marginTop: "4px" }}>
+                        Para crear la cuenta tenés que aceptar los términos y la política de privacidad.
                     </p>
                 )}
             </div>

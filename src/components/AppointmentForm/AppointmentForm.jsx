@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import Login from "../auth/Login";
 import Register from "../auth/Register";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import { bookAppointment, resendVerificationEmail } from "../../services/appointments.services";
 import { fromDateKey } from "../../utils/dates";
 import { backdropClose } from "../../utils/backdrop";

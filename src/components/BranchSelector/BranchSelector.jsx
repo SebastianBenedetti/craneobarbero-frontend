@@ -24,7 +24,7 @@ function BranchSelector({ branches, onSelectBranch, initialSelected = null }) {
   return (
     <div style={{ marginTop: "4rem" }}>
       <h5 className="section-title">Seleccioná una sucursal:</h5>
-      <Row className="g-5">{mapedBranches}</Row>
+      <Row className="g-4 g-lg-5">{mapedBranches}</Row>
     </div>
   );
 }

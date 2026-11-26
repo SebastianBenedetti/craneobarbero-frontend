@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import AppointmentEditModal from "../../components/AppointmentEditModal/AppointmentEditModal";
 import CancelAppointmentModal from "../../components/CancelAppointmentModal/CancelAppointmentModal";
 import AppointmentStatusBadge from "../../components/AppointmentStatusBadge/AppointmentStatusBadge";

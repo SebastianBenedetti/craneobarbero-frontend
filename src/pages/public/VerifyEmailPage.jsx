@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import AuthCard from "../../components/AuthCard/AuthCard";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import { verifyEmail } from "../../services/account.services";
 
 function VerifyEmailPage() {

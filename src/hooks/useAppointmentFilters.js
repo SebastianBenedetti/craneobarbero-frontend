@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 // hook para manejar filtros y paginado de turnos
 // lo usamos en la agenda del barber y en el panel admin
@@ -24,9 +24,12 @@ function useAppointmentFilters(appointments) {
 
   // cada vez que cambia algo del filtro, volvemos a la primera página
   // para no quedar en una página que ya no existe
-  useEffect(() => {
+  const filterKey = [activeFilter, dateFrom, dateTo, pageSize, filterBarberId, filterBranchId].join("|");
+  const [lastFilterKey, setLastFilterKey] = useState(filterKey);
+  if (lastFilterKey !== filterKey) {
+    setLastFilterKey(filterKey);
     setCurrentPage(1);
-  }, [activeFilter, dateFrom, dateTo, pageSize, filterBarberId, filterBranchId]);
+  }
 
   // filtramos por estado
   const filteredByStatus = appointments.filter((a) => {

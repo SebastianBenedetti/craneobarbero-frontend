@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import UsersSection from "./sections/UsersSection";
 import BarbersSection from "./sections/BarbersSection";
 import BranchesSection from "./sections/BranchesSection";

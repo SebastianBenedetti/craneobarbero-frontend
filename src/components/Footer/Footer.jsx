@@ -1,5 +1,5 @@
 import "../../styles/footer.css";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 
 function Footer() {
   return (
@@ -19,12 +19,14 @@ function Footer() {
           </Link>
           <Link to="/appointment">Sacar turno</Link>
           <Link to="/about">Nosotros</Link>
+          <Link to="/terms">Términos y condiciones</Link>
+          <Link to="/privacy">Política de privacidad</Link>
         </div>
 
         <div className="footer-contact">
           <h4 className="footer-section-title">Contacto</h4>
           <p>Rosario, Santa Fe</p>
-          <p>info@craneobarbero.com</p>
+          <p>craneobarbero@gmail.com</p>
           <div className="footer-socials">
             <a href="#" aria-label="Instagram">
               <i className="ti ti-brand-instagram"></i>
@@ -40,7 +42,7 @@ function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <p>© 2025 Barbería Cráneo Barbero. Todos los derechos reservados.</p>
+        <p>© 2026 Barbería Cráneo Barbero. Todos los derechos reservados.</p>
       </div>
     </footer>
   );
