@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatMoney } from "../../utils/format";
 
 function CutSelector({ cuts, onSelectCut }) {
   const [selected, setSelected] = useState(null);
@@ -21,7 +22,7 @@ function CutSelector({ cuts, onSelectCut }) {
             }}
           >
             <div className="fw-bold">{cut.name}</div>
-            <div className="small">{cut.price}</div>
+            <div className="small">{formatMoney(cut.price)}</div>
           </button>
         ))}
       </div>
