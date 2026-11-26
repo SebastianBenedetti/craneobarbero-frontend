@@ -23,7 +23,7 @@ function BarberList({ barbers, onSelectBarber }) {
   return (
     <div className="mt-4">
       <h5 className="mb-3 text-white">Seleccioná un barbero:</h5>
-      <Row className="g-5">{mapedBarbers}</Row>
+      <Row className="g-4 g-lg-5">{mapedBarbers}</Row>
     </div>
   );
 }
