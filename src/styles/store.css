@@ -598,3 +598,55 @@
     order: 3;
   }
 }
+
+.store-overview {
+  margin-bottom: 40px;
+}
+
+.store-stat-button {
+  cursor: pointer;
+  font: inherit;
+  transition: border-color 0.2s;
+}
+
+.store-stat-button:hover {
+  border-color: rgba(255, 200, 49, 0.6);
+}
+
+.store-latest-orders {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+}
+
+.store-latest-orders li {
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr) auto auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.store-latest-client {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 576px) {
+  .store-latest-orders li {
+    grid-template-columns: 50px minmax(0, 1fr) auto;
+  }
+
+  .store-latest-orders li > span:nth-child(3) {
+    display: none;
+  }
+
+  .store-latest-orders li > .status-badge {
+    grid-column: 2 / -1;
+    justify-self: start;
+  }
+}

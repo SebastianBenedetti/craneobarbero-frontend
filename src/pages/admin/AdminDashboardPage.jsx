@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "../../context/AuthContext";
 import { getAllAppointmentsAdminService } from "../../services/admin.services";
@@ -6,6 +6,7 @@ import { getAllUsersService } from "../../services/admin.services";
 import { getAllBranchesAdminService } from "../../services/admin.services";
 import { getAdminSummary } from "../../services/reports.services";
 import { getStockAlerts } from "../../services/store.services";
+import StoreOverview from "./sections/store/StoreOverview";
 import { todayKey, addDays, monthRange } from "../../utils/dates";
 import "../../styles/adminDashboard.css";
 import "../../styles/store.css";
@@ -85,15 +86,21 @@ function AdminDashboardPage() {
 
   // lo facturado lo calcula el servidor con las reglas de ingreso (turnos y productos)
   const [totalRevenue, setTotalRevenue] = useState(0);
-  useEffect(() => {
+  const [productIncome, setProductIncome] = useState(0);
+  const period = useMemo(() => {
     const today = todayKey();
-    const period = statsMonth
+    return statsMonth
       ? monthRange(Number(statsMonth.slice(0, 4)), Number(statsMonth.slice(5, 7)) - 1)
       : { from: addDays(today, -730), to: today };
-    getAdminSummary(period)
-      .then((summary) => setTotalRevenue(Number(summary.totalIncome)))
-      .catch(() => setTotalRevenue(0));
   }, [statsMonth]);
+  useEffect(() => {
+    getAdminSummary(period)
+      .then((summary) => {
+        setTotalRevenue(Number(summary.totalIncome));
+        setProductIncome(Number(summary.products?.income ?? 0));
+      })
+      .catch(() => { setTotalRevenue(0); setProductIncome(0); });
+  }, [period]);
 
   // solo contamos los usuarios con rol "client", los admin no se incluyen
   const totalClients = users.filter((u) => u.role === "client").length;
@@ -266,6 +273,8 @@ function AdminDashboardPage() {
             </div>
           </section>
 
+          <StoreOverview period={period} productIncome={productIncome} />
+
           {/* botones rapidos para ir a cada seccion de gestion */}
           <section className="admin-quick-access">
             <h2 className="admin-section-title">Gestión rápida</h2>
@@ -303,11 +312,23 @@ function AdminDashboardPage() {
               >
                 Turnos
               </button>
-              <button
-                className="admin-quick-btn"
-                onClick={() => navigate("/admin/store")}
-              >
-                Tienda y stock
+            </div>
+          </section>
+
+          <section className="admin-quick-access mt-4">
+            <h2 className="admin-section-title">Gestión de la tienda</h2>
+            <div className="admin-quick-grid">
+              <button className="admin-quick-btn" onClick={() => navigate("/admin/store")}>
+                Pedidos
+              </button>
+              <button className="admin-quick-btn" onClick={() => navigate("/admin/store?tab=products")}>
+                Productos
+              </button>
+              <button className="admin-quick-btn" onClick={() => navigate("/admin/store?tab=reorder")}>
+                Para reponer
+              </button>
+              <button className="admin-quick-btn" onClick={() => navigate("/admin/prices")}>
+                Precios
               </button>
             </div>
           </section>
