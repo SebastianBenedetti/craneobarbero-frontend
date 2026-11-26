@@ -25,6 +25,7 @@ import AdminAgendaPage from "../../pages/admin/AdminAgendaPage";
 import AdminPricesPage from "../../pages/admin/AdminPricesPage";
 import AdminReportsPage from "../../pages/admin/AdminReportsPage";
 import BarberReportsPage from "../../pages/barber/BarberReportsPage";
+import BarberReviewsPage from "../../pages/barber/BarberReviewsPage";
 import AdminStorePage from "../../pages/admin/AdminStorePage";
 import ShopPage from "../../pages/client/ShopPage";
 import MyPurchasesPage from "../../pages/client/MyPurchasesPage";
@@ -51,6 +52,7 @@ function AppRouter() {
                   <Route path="schedule" element={<BarberSchedulePage />} />
                   <Route path="clients" element={<BarberClientsPage />} />
                   <Route path="reports" element={<BarberReportsPage />} />
+                  <Route path="reviews" element={<BarberReviewsPage />} />
                 </Route>
               </Route>
 

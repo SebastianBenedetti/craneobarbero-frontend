@@ -100,6 +100,9 @@ function Navbar() {
             <Link to="/barber/reports" className={isActive("/barber/reports")}>
               Mis reportes
             </Link>
+            <Link to="/barber/reviews" className={isActive("/barber/reviews")}>
+              Mis reseñas
+            </Link>
           </>
         )}
 
