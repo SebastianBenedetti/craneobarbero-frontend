@@ -76,7 +76,13 @@ function BookingAssistant({ bottomOffset = false, guest = false }) {
       setConversationId(data.conversationId);
       setMessages((current) => [
         ...current,
-        entry("assistant", { text: data.reply, summary: data.summary, checkoutUrl: data.checkoutUrl, done: data.step === "done" }),
+        entry("assistant", {
+          text: data.reply,
+          summary: data.summary,
+          checkoutUrl: data.checkoutUrl,
+          done: data.step === "done",
+          products: data.products ?? [],
+        }),
       ]);
       setOptions(data.options ?? []);
     } catch (err) {
@@ -122,6 +128,11 @@ function BookingAssistant({ bottomOffset = false, guest = false }) {
     navigate(`${location.pathname}${location.search}`, { replace: true, state: null });
     startAfterLogin();
   }, [guest, location.state, location.pathname, location.search, navigate]);
+
+  const showProduct = (productId) => {
+    setOpen(false);
+    navigate(`/shop?product=${productId}`);
+  };
 
   const goToLogin = (view) => {
     navigate("/login", {
@@ -231,6 +242,22 @@ function BookingAssistant({ bottomOffset = false, guest = false }) {
                       ))}
                     </div>
                     {message.summary && <SummaryCard summary={message.summary} />}
+                    {message.products?.length > 0 && (
+                      <ul className="assistant-products">
+                        {message.products.map((product) => (
+                          <li key={product.id} className="assistant-product">
+                            <span className="assistant-product-name">{product.name}</span>
+                            <span className="assistant-product-price">
+                              {formatMoney(product.price)}
+                              {!product.inStock && <span className="assistant-summary-muted">Sin stock</span>}
+                            </span>
+                            <button type="button" className="assistant-option" onClick={() => showProduct(product.id)}>
+                              Ver en la tienda
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                     {message.checkoutUrl && (
                       <a className="assistant-checkout" href={message.checkoutUrl}>
                         Pagar con Mercado Pago

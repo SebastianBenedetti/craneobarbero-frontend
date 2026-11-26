@@ -660,3 +660,18 @@
     justify-self: start;
   }
 }
+
+.shop-card-focused {
+  border-color: var(--accent-primary);
+  animation: shop-card-focus 1.2s ease-in-out 2;
+}
+
+@keyframes shop-card-focus {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 200, 49, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(255, 200, 49, 0.45);
+  }
+}
