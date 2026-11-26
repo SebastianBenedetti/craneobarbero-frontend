@@ -25,11 +25,11 @@ export const getBarberServices = (params) => get("/reports/barber/services", par
 export const getBarberClients = (params) => get("/reports/barber/clients", params, "No se pudieron cargar los clientes");
 export const getBarberPeriods = (params) => get("/reports/barber/periods", params, "No se pudo cargar el reporte por período");
 
-export async function downloadAdminReport(format, params) {
+async function downloadFile(path, params, fallbackName) {
   const token = localStorage.getItem("barberia-token");
   let res;
   try {
-    res = await fetch(`${BASE_URL}/reports/admin/export${queryString({ ...params, format })}`, {
+    res = await fetch(`${BASE_URL}${path}${queryString(params)}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
   } catch {
@@ -42,8 +42,9 @@ export async function downloadAdminReport(format, params) {
   }
 
   const disposition = res.headers.get("Content-Disposition") || "";
-  const match = disposition.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i);
-  const fileName = match ? decodeURIComponent(match[1]) : `reporte.${format}`;
+  const match =
+    disposition.match(/filename\*=UTF-8''([^;]+)/i) || disposition.match(/filename="?([^";]+)"?/i);
+  const fileName = match ? decodeURIComponent(match[1]) : fallbackName;
   const url = URL.createObjectURL(await res.blob());
   const link = document.createElement("a");
   link.href = url;
@@ -52,4 +53,13 @@ export async function downloadAdminReport(format, params) {
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
+  return res.headers;
+}
+
+export const downloadAdminReport = (format, params) =>
+  downloadFile("/reports/admin/export", { ...params, format }, `reporte.${format}`);
+
+export async function downloadAiReport(params) {
+  const headers = await downloadFile("/reports/admin/ai-report", params, "Reporte mensual Cráneo Barbero.pdf");
+  return headers.get("X-Report-Ai") === "true";
 }
