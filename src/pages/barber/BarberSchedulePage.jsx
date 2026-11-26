@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import { getStaffAppointments } from "../../services/appointments.services";
 import useAppointmentFilters from "../../hooks/useAppointmentFilters";
 import AppointmentModal from "../../components/AppointmentModal/AppointmentModal";

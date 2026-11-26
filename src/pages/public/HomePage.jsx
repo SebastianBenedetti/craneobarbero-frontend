@@ -3,7 +3,7 @@ import "../../styles/animations.css";
 
 import { useEffect } from "react";
 import { Navigate, useNavigate } from "react-router";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 
 const PANEL_BY_ROLE = { admin: "/admin", barber: "/barber" };
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import Toast from "../../components/Toast/Toast";
 import AccountClosureModal from "../../components/AccountClosureModal/AccountClosureModal";
 import {

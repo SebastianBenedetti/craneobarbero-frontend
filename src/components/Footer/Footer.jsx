@@ -1,5 +1,5 @@
 import "../../styles/footer.css";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 
 function Footer() {
   return (

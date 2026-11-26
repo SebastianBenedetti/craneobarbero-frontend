@@ -7,7 +7,7 @@ const parseErrorMessage = async (res, fallback) => {
   try {
     const data = await res.json();
     return data.error || fallback;
-  } catch (_) {
+  } catch {
     return fallback;
   }
 };

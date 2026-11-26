@@ -1,5 +1,4 @@
 import AppointmentForm from "../../components/AppointmentForm/AppointmentForm";
-import BarberCard from "../../components/BarberCard/BarberCard";
 import BarberList from "../../components/BarberList/BarberList";
 import BranchSelector from "../../components/BranchSelector/BranchSelector";
 import Calendar from "../../components/Calendar/Calendar";
@@ -7,8 +6,7 @@ import TimeSlots from "../../components/TimeSlots/TimeSlots";
 import CutSelector from "../../components/CutSelector/CutSelector";
 import "../../styles/appointment.css";
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router";
-import { Button } from "react-bootstrap";
+import { useLocation } from "react-router";
 import useBranches from "../../hooks/useBranches.js";
 import useBarbers from "../../hooks/useBarbers.js";
 import useCuts from "../../hooks/useCuts.js";
@@ -23,7 +21,6 @@ function AppointmentPage() {
   const cuts = useCuts();
   const [selectedBranch, setSelectedBranch] = useState(location.state?.branchId ?? null);
   const [selectedBarber, setSelectedBarber] = useState(null);
-  const navigate = useNavigate();
 
   const handleSelectBranch = (branchId) => {
     setSelectedBranch(branchId);

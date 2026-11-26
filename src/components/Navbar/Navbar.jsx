@@ -1,7 +1,7 @@
 import "../../styles/navbar.css";
 import { Link, useNavigate, useLocation } from "react-router";
 import { useState, useRef, useEffect } from "react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import useCart from "../../hooks/useCart";
 
 function Navbar() {
@@ -25,10 +25,12 @@ function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
+  const [lastPath, setLastPath] = useState(location.pathname);
+  if (lastPath !== location.pathname) {
+    setLastPath(location.pathname);
     setMenuOpen(false);
     setDropdownOpen(false);
-  }, [location.pathname]);
+  }
 
   const handleLogout = () => {
     logout();

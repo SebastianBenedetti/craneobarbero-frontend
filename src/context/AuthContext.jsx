@@ -1,9 +1,6 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { AuthContext } from "./auth";
 import { SESSION_EXPIRED_EVENT } from "../services/api";
-
-// Creamos el contexto de autenticación
-// Esto nos permite compartir el usuario logueado en toda la app sin pasar props de padre a hijo
-const AuthContext = createContext(null);
 
 // Decodifica el payload del token JWT para obtener los datos del usuario (id, role, name, exp)
 // El JWT tiene 3 partes separadas por puntos: header.payload.signature
@@ -66,11 +63,4 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-// Hook personalizado para usar el contexto de auth en cualquier componente
-// En vez de escribir useContext(AuthContext) cada vez, se usa useAuth()
-// Ejemplo: const { user, login, logout } = useAuth();
-export function useAuth() {
-  return useContext(AuthContext);
 }
