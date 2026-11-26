@@ -34,11 +34,11 @@ export const loginService = (email, password, onSuccess, onError) => {
 
 // Crea un nuevo usuario con rol CLIENT y devuelve el token JWT
 // El usuario queda logueado automáticamente al registrarse sin necesidad de un segundo login
-export const registerService = (name, email, password, onSuccess, onError) => {
+export const registerService = (name, email, password, acceptTerms, onSuccess, onError) => {
   fetch(`${BASE_URL}/auth/register`, {
     headers: { "Content-Type": "application/json" },
     method: "POST",
-    body: JSON.stringify({ name, email, password })
+    body: JSON.stringify({ name, email, password, acceptTerms })
   })
     .then(async (res) => {
       if (!res.ok) {

@@ -18,6 +18,7 @@ import BarberClientsPage from "../../pages/barber/BarberClientsPage";
 import VerifyEmailPage from "../../pages/public/VerifyEmailPage";
 import ForgotPasswordPage from "../../pages/public/ForgotPasswordPage";
 import ResetPasswordPage from "../../pages/public/ResetPasswordPage";
+import LegalPage from "../../pages/public/LegalPage";
 import PaymentReturnPage from "../../pages/client/PaymentReturnPage";
 import AdminDashboardPage from "../../pages/admin/AdminDashboardPage";
 import AdminManagePage from "../../pages/admin/AdminManagePage";
@@ -45,6 +46,8 @@ function AppRouter() {
               <Route path="/verify-email" element={<VerifyEmailPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/terms" element={<LegalPage type="terms" />} />
+              <Route path="/privacy" element={<LegalPage type="privacy" />} />
 
               <Route element={<ProtectedRoute roles={["barber"]} />}>
                 <Route path="/barber">
