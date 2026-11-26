@@ -446,3 +446,42 @@
     max-width: 90%;
   }
 }
+
+.assistant-products {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.assistant-product {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.35rem 0.75rem;
+  background-color: rgba(255, 200, 49, 0.06);
+  border: 1px solid rgba(255, 200, 49, 0.35);
+  border-radius: 12px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.88rem;
+}
+
+.assistant-product-name {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.assistant-product-price {
+  color: var(--accent-primary);
+  font-weight: 700;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+}
+
+.assistant-product .assistant-option {
+  grid-column: 1 / -1;
+  justify-self: start;
+}

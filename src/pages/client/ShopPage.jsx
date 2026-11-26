@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import useCart from "../../hooks/useCart";
 import useBranches from "../../hooks/useBranches";
 import { MAX_CART_PRODUCTS, MAX_CART_QUANTITY } from "../../context/CartProvider";
@@ -10,12 +10,14 @@ import "../../styles/store.css";
 
 function ShopPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const focusedId = Number(searchParams.get("product")) || null;
   const cart = useCart();
   const { syncProducts } = cart;
   const branches = useBranches();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [categoryId, setCategoryId] = useState("");
+  const [categoryId, setCategoryId] = useState(() => searchParams.get("category") ?? "");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -39,6 +41,11 @@ function ShopPage() {
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [syncProducts]);
+
+  useEffect(() => {
+    if (loading || !focusedId) return;
+    document.getElementById(`product-${focusedId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [loading, focusedId]);
 
   useEffect(() => {
     if (!added) return undefined;
@@ -136,7 +143,11 @@ function ShopPage() {
             {visible.map((product) => {
               const inCart = cart.items.find((i) => i.productId === product.id);
               return (
-                <article key={product.id} className={`shop-card ${product.inStock ? "" : "shop-card-out"}`}>
+                <article
+                  key={product.id}
+                  id={`product-${product.id}`}
+                  className={`shop-card ${product.inStock ? "" : "shop-card-out"} ${product.id === focusedId ? "shop-card-focused" : ""}`}
+                >
                   <div className="shop-card-image">
                     {product.imageUrl
                       ? <img src={product.imageUrl} alt={product.name} loading="lazy" onError={(e) => { e.target.style.display = "none"; }} />
