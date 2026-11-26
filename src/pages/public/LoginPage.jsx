@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { useAuth } from "../../hooks/useAuth";
 import Login from "../../components/auth/Login";
 import Register from "../../components/auth/Register";
@@ -8,28 +8,25 @@ import { useState } from "react";
 function LoginPage() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
-  const [view, setView] = useState("login");
-
-  const roleRedirect = (role) => {
-    if (role === "barber") return "/barber";
-    if (role === "admin") return "/admin";
-    return "/";
-  };
+  const location = useLocation();
+  const returnTo = location.state?.from;
+  const reopenAssistant = Boolean(location.state?.openAssistant);
+  const [view, setView] = useState(location.state?.view === "register" ? "register" : "login");
 
   useEffect(() => {
-    if (user) navigate(roleRedirect(user.role));
-  }, [user, navigate]);
+    if (!user) return;
+    if (user.role === "barber") navigate("/barber", { replace: true });
+    else if (user.role === "admin") navigate("/admin", { replace: true });
+    else if (returnTo) navigate(returnTo, { replace: true, state: reopenAssistant ? { openAssistant: true } : null });
+    else navigate("/", { replace: true });
+  }, [user, navigate, returnTo, reopenAssistant]);
 
   const handleLoginSuccess = (token) => {
     login(token);
-    const decoded = JSON.parse(atob(token.split(".")[1]));
-    navigate(roleRedirect(decoded.role));
   };
 
   const handleRegisterSuccess = (token) => {
     login(token);
-    const decoded = JSON.parse(atob(token.split(".")[1]));
-    navigate(roleRedirect(decoded.role));
   };
 
   return (

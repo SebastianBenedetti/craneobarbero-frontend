@@ -32,7 +32,9 @@ function Layout() {
           <i className="ti ti-scissors" />
         </button>
       )}
-      {user?.role === "client" && <BookingAssistant key={user.id} bottomOffset={showFab} />}
+      {(!user || user.role === "client") && (
+        <BookingAssistant key={user?.id ?? "guest"} guest={!user} bottomOffset={showFab} />
+      )}
     </div>
   );
 }

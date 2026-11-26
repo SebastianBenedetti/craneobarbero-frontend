@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router";
 import "../../styles/assistant.css";
 import { sendAssistantMessage } from "../../services/assistant.services";
 import { resendVerificationEmail } from "../../services/appointments.services";
@@ -47,9 +47,14 @@ function SummaryCard({ summary }) {
   );
 }
 
-function BookingAssistant({ bottomOffset = false }) {
-  const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
+const GUEST_GREETING =
+  "¡Hola! Soy el asistente de Cráneo Barbero. Te ayudo a sacar un turno en un minuto.\nPara reservar necesitás una cuenta: iniciá sesión o creá una y te espero acá.";
+
+function BookingAssistant({ bottomOffset = false, guest = false }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(() => !guest && Boolean(location.state?.openAssistant));
+  const [messages, setMessages] = useState(() => (guest ? [entry("assistant", { text: GUEST_GREETING })] : []));
   const [conversationId, setConversationId] = useState(null);
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -94,7 +99,7 @@ function BookingAssistant({ bottomOffset = false }) {
 
   const openAssistant = () => {
     setOpen(true);
-    if (!started.current) {
+    if (!guest && !started.current) {
       started.current = true;
       talk({});
     }
@@ -103,6 +108,25 @@ function BookingAssistant({ bottomOffset = false }) {
   const close = () => {
     setOpen(false);
     fabRef.current?.focus();
+  };
+
+  const startAfterLogin = useEffectEvent(() => {
+    if (!started.current) {
+      started.current = true;
+      talk({});
+    }
+  });
+
+  useEffect(() => {
+    if (guest || !location.state?.openAssistant) return;
+    navigate(`${location.pathname}${location.search}`, { replace: true, state: null });
+    startAfterLogin();
+  }, [guest, location.state, location.pathname, location.search, navigate]);
+
+  const goToLogin = (view) => {
+    navigate("/login", {
+      state: { from: `${location.pathname}${location.search}`, openAssistant: true, view },
+    });
   };
 
   useEffect(() => {
@@ -222,6 +246,17 @@ function BookingAssistant({ bottomOffset = false }) {
               ),
             )}
 
+            {guest && (
+              <div className="assistant-options" role="group" aria-label="Opciones">
+                <button type="button" className="assistant-option" onClick={() => goToLogin("login")}>
+                  Iniciar sesión
+                </button>
+                <button type="button" className="assistant-option" onClick={() => goToLogin("register")}>
+                  Crear cuenta
+                </button>
+              </div>
+            )}
+
             {needsVerification && (
               <div className="assistant-options">
                 <button
@@ -271,14 +306,14 @@ function BookingAssistant({ bottomOffset = false }) {
               value={input}
               maxLength={MAX_LENGTH}
               onChange={(event) => setInput(event.target.value)}
-              placeholder="Escribí, por ejemplo: el sábado a la mañana"
-              disabled={needsVerification}
+              placeholder={guest ? "Iniciá sesión para escribirme" : "Escribí, por ejemplo: el sábado a la mañana"}
+              disabled={guest || needsVerification}
               autoComplete="off"
             />
             <button
               type="submit"
               className="assistant-send"
-              disabled={loading || needsVerification || !input.trim()}
+              disabled={guest || loading || needsVerification || !input.trim()}
               aria-label="Enviar"
             >
               <i className="ti ti-send" aria-hidden="true" />
