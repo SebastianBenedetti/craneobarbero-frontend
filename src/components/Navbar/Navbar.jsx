@@ -2,9 +2,11 @@ import "../../styles/navbar.css";
 import { Link, useNavigate, useLocation } from "react-router";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
+import useCart from "../../hooks/useCart";
 
 function Navbar() {
   const { user, logout } = useAuth();
+  const { count: cartCount } = useCart();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -64,6 +66,17 @@ function Navbar() {
               Sacar turno
             </Link>
             <Link to="/">Inicio</Link>
+            <Link to="/shop" className={isActive("/shop")}>
+              Tienda
+              {user && cartCount > 0 && (
+                <span className="navbar-cart-count" aria-label={`${cartCount} productos en el carrito`}>{cartCount}</span>
+              )}
+            </Link>
+            {user && (
+              <Link to="/my-account/purchases" className={isActive("/my-account/purchases")}>
+                Mis compras
+              </Link>
+            )}
             <Link to="/about">Nosotros</Link>
           </>
         )}
@@ -98,6 +111,9 @@ function Navbar() {
             </Link>
             <Link to="/admin/agenda" className={isActive("/admin/agenda")}>
               Agenda
+            </Link>
+            <Link to="/admin/store" className={isActive("/admin/store")}>
+              Tienda
             </Link>
             <Link to="/admin/prices" className={isActive("/admin/prices")}>
               Precios
