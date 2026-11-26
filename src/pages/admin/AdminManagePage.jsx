@@ -6,6 +6,7 @@ import BarbersSection from "./sections/BarbersSection";
 import BranchesSection from "./sections/BranchesSection";
 import ServicesSection from "./sections/ServicesSection";
 import AppointmentsSection from "./sections/AppointmentsSection";
+import ReviewsPanel from "../../components/ReviewList/ReviewsPanel";
 import "../../styles/adminDashboard.css";
 
 // las pestañas disponibles con su id y etiqueta
@@ -16,6 +17,7 @@ const TABS = [
   { id: "branches", label: "Sucursales" },
   { id: "services", label: "Servicios" },
   { id: "appointments", label: "Turnos" },
+  { id: "reviews", label: "Reseñas" },
 ];
 
 function AdminManagePage() {
@@ -59,6 +61,15 @@ function AdminManagePage() {
         return <ServicesSection />;
       case "appointments":
         return <AppointmentsSection />;
+      case "reviews":
+        return (
+          <div className="admin-section">
+            <div className="admin-section-header">
+              <h2 className="admin-section-title">Reseñas</h2>
+            </div>
+            <ReviewsPanel isAdmin />
+          </div>
+        );
       default:
         return <UsersSection key="client" role="client" />;
     }

@@ -600,7 +600,17 @@
 }
 
 .store-overview {
+  margin-top: 40px;
   margin-bottom: 40px;
+}
+
+.store-overview > .admin-section-title {
+  margin-bottom: 16px;
+}
+
+.store-overview > .admin-stats-grid,
+.store-overview > .admin-breakdown-grid {
+  margin-bottom: 24px;
 }
 
 .store-stat-button {

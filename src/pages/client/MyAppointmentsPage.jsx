@@ -5,6 +5,9 @@ import AppointmentEditModal from "../../components/AppointmentEditModal/Appointm
 import CancelAppointmentModal from "../../components/CancelAppointmentModal/CancelAppointmentModal";
 import AppointmentStatusBadge from "../../components/AppointmentStatusBadge/AppointmentStatusBadge";
 import { getMyAppointments, payAppointment } from "../../services/appointments.services";
+import ReviewModal from "../../components/ReviewModal/ReviewModal";
+import StarDisplay from "../../components/StarRating/StarDisplay";
+import { getMyReviews } from "../../services/reviews.services";
 
 const MODIFY_WINDOW_HOURS = 4;
 
@@ -30,6 +33,8 @@ function MyAppointmentsPage() {
   // mensaje de feedback que aparece debajo del turno afectado (no es un toast global)
   const [actionMsg, setActionMsg] = useState({ id: null, text: "", type: "" });
   const [payingId, setPayingId] = useState(null);
+  const [reviews, setReviews] = useState({});
+  const [reviewing, setReviewing] = useState(null);
 
   useEffect(() => {
     document.title = " Mis turnos | Cráneo Barbero";
@@ -45,6 +50,9 @@ function MyAppointmentsPage() {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
+    getMyReviews()
+      .then((list) => setReviews(Object.fromEntries(list.map((r) => [r.appointmentId, r]))))
+      .catch(() => setReviews({}));
   }, []);
 
   // solo cargamos turnos si hay un usuario logueado
@@ -220,6 +228,24 @@ function MyAppointmentsPage() {
                   </span>
                   <AppointmentStatusBadge appointment={appointment} forClient />
                 </div>
+                {appointment.status === "completed" && (reviews[appointment.id] ? (
+                  <div className="review-mine">
+                    <div className="review-mine-ratings">
+                      <span>Tu calificación:</span>
+                      <span>Barbero <StarDisplay value={reviews[appointment.id].ratingBarber} size="0.9rem" /></span>
+                      <span>Servicio <StarDisplay value={reviews[appointment.id].ratingCut} size="0.9rem" /></span>
+                    </div>
+                    <div className="review-mine-comment">
+                      Comentario: <span className="text-light">{reviews[appointment.id].comment ?? ""}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-2">
+                    <button className="btn btn-sm btn-outline-warning" onClick={() => setReviewing(appointment)}>
+                      Calificar
+                    </button>
+                  </div>
+                ))}
               </div>
             );
           })}
@@ -235,6 +261,17 @@ function MyAppointmentsPage() {
             replace(updated);
             setActionMsg({ id: updated.id, text: "Turno modificado. Te enviamos un mail con los datos nuevos.", type: "success" });
             setEditingAppointment(null);
+          }}
+        />
+      )}
+
+      {reviewing && (
+        <ReviewModal
+          appointment={reviewing}
+          onClose={() => setReviewing(null)}
+          onSaved={(review) => {
+            setReviews((prev) => ({ ...prev, [review.appointmentId]: review }));
+            setReviewing(null);
           }}
         />
       )}
