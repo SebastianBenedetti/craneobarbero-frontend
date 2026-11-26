@@ -12,7 +12,7 @@ import { Link } from "react-router";
 import { registerService } from "./auth.services";
 import { isStrongPassword, PASSWORD_POLICY } from "../../utils/password";
 
-const Register = ({ onRegister, onCancel }) => {
+const Register = ({ onRegister, onCancel, subtitle = "Creá tu cuenta para confirmar el turno" }) => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -90,7 +90,7 @@ const Register = ({ onRegister, onCancel }) => {
 
     return (
         <form onSubmit={handleSubmit}>
-            <p className="text-warning mb-4">Creá tu cuenta para confirmar el turno</p>
+            <p className="text-warning mb-4">{subtitle}</p>
 
             <div className="mb-3">
                 <input
@@ -164,6 +164,7 @@ const Register = ({ onRegister, onCancel }) => {
                 <label className="terms-check">
                     <input
                         type="checkbox"
+                        aria-label="Acepto los términos y condiciones y la política de privacidad"
                         checked={acceptTerms}
                         onChange={(e) => { setAcceptTerms(e.target.checked); clearError("terms"); }}
                     />

@@ -3,7 +3,7 @@ import { useRef, useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router";
 import { loginService } from "./auth.services";
 
-const Login = ({ onLogin, onCancel, context }) => {
+const Login = ({ onLogin, onCancel, context, subtitle = "Iniciá sesión para confirmar tu turno" }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   // errores de validación por campo, se muestran debajo de cada input
@@ -69,7 +69,7 @@ const Login = ({ onLogin, onCancel, context }) => {
 
   return (
     <form onSubmit={handleLogin}>
-      <p className="text-warning mb-4">Iniciá sesión para confirmar tu turno</p>
+      <p className="text-warning mb-4">{subtitle}</p>
 
       <div className="mb-3">
         <input
