@@ -47,8 +47,8 @@ function HomePage() {
           <span className="text-gold">siempre a un turno</span> de distancia
         </h1>
         <p className="hero-subtitle">
-          Tres sucursales en la ciudad y expandiendónos a los alrededores.
-          Forjador de imágen. Reservá en segundos, sin esperas.
+          Cuatro sucursales en Rosario y alrededores. Forjador de imagen.
+          Reservá en segundos, sin esperas.
         </p>
         <div className="hero-cta">
           <h2 className="hero-cta-title">¿Listo para tu próximo corte?</h2>

@@ -85,6 +85,10 @@ function AboutPage() {
                 <span className="timeline-year">2025</span>
                 <p>Funes - Fisherton y sistema de turnos online</p>
               </div>
+              <div className="timeline-item">
+                <span className="timeline-year">2026</span>
+                <p>Cuarta sucursal en Casilda</p>
+              </div>
             </div>
           </div>
         </div>
