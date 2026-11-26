@@ -8,8 +8,8 @@ import {
 import PaginationControls from "../../../components/PaginationControls/PaginationControls";
 import ConfirmModal from "../../../components/ConfirmModal/ConfirmModal";
 import Toast from "../../../components/Toast/Toast";
-import { IMAGE_URL_HINT, IMAGE_URL_PATTERN } from "../../../utils/image";
 import { backdropClose } from "../../../utils/backdrop";
+import ImageField from "../../../components/ImageField/ImageField";
 
 const EMPTY_FORM = { name: "", address: "", phone: "", imageUrl: "" };
 
@@ -238,25 +238,7 @@ function BranchesSection() {
                 <p className="admin-form-hint">Es el número que ven los clientes al sacar un turno en esta sucursal.</p>
               </div>
               <div className="mb-4">
-                <label htmlFor="branch-image" className="admin-form-label">Imagen</label>
-                <input
-                  id="branch-image"
-                  type="text" inputMode="url" pattern={IMAGE_URL_PATTERN} title={IMAGE_URL_HINT}
-                  name="imageUrl"
-                  placeholder="URL de imagen (opcional)"
-                  value={form.imageUrl}
-                  onChange={handleChange}
-                  maxLength={500}
-                  className="form-control bg-secondary text-white border-secondary"
-                />
-                {form.imageUrl && (
-                  <img
-                    src={form.imageUrl}
-                    alt="Vista previa de la sucursal"
-                    style={{ width: "100%", maxHeight: "120px", objectFit: "cover", borderRadius: "6px", marginTop: "8px", border: "2px solid #ffc107" }}
-                    onError={(e) => { e.target.style.display = "none"; }}
-                  />
-                )}
+                <ImageField id="branch-image" label="Imagen" value={form.imageUrl} onChange={handleChange} aspect={4 / 5} labelClassName="admin-form-label" inputClassName="form-control bg-secondary text-white border-secondary" />
               </div>
 
               {formError && (

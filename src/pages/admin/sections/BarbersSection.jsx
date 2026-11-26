@@ -9,8 +9,8 @@ import { getAllBranchesAdminService } from "../../../services/admin.services";
 import PaginationControls from "../../../components/PaginationControls/PaginationControls";
 import ConfirmModal from "../../../components/ConfirmModal/ConfirmModal";
 import Toast from "../../../components/Toast/Toast";
-import { IMAGE_URL_HINT, IMAGE_URL_PATTERN } from "../../../utils/image";
 import { backdropClose } from "../../../utils/backdrop";
+import ImageField from "../../../components/ImageField/ImageField";
 
 const EMPTY_FORM = {
   name: "",
@@ -386,25 +386,7 @@ function BarbersSection() {
               </div>
 
               <div className="mb-4">
-                <label htmlFor="barber-image" className="admin-form-label">Foto</label>
-                <input
-                  id="barber-image"
-                  type="text" inputMode="url" pattern={IMAGE_URL_PATTERN} title={IMAGE_URL_HINT}
-                  name="imageUrl"
-                  placeholder="URL de la foto (opcional)"
-                  value={form.imageUrl}
-                  onChange={handleChange}
-                  maxLength={500}
-                  className="form-control bg-secondary text-white border-secondary"
-                />
-                {form.imageUrl && (
-                  <img
-                    src={form.imageUrl}
-                    alt="Vista previa del barbero"
-                    style={{ width: "72px", height: "72px", objectFit: "cover", borderRadius: "50%", marginTop: "8px", border: "2px solid #ffc107" }}
-                    onError={(e) => { e.target.style.display = "none"; }}
-                  />
-                )}
+                <ImageField id="barber-image" label="Foto" value={form.imageUrl} onChange={handleChange} aspect={4 / 3} labelClassName="admin-form-label" inputClassName="form-control bg-secondary text-white border-secondary" />
               </div>
 
               {formError && (

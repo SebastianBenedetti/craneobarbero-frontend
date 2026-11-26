@@ -18,7 +18,8 @@ const describe = (data, fallback) => {
 };
 
 export async function apiRequest(path, { method = "GET", body, auth = true, fallbackError = "No se pudo completar la operación" } = {}) {
-  const headers = { "Content-Type": "application/json" };
+  const isForm = body instanceof FormData;
+  const headers = isForm ? {} : { "Content-Type": "application/json" };
   const token = localStorage.getItem(TOKEN_KEY);
   if (auth && token) headers.Authorization = `Bearer ${token}`;
 
@@ -27,7 +28,7 @@ export async function apiRequest(path, { method = "GET", body, auth = true, fall
     res = await fetch(`${BASE_URL}${path}`, {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
     });
   } catch {
     throw new ApiError("No se pudo conectar con el servidor. Revisá tu conexión e intentá de nuevo.");

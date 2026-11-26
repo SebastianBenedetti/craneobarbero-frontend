@@ -1,0 +1,104 @@
+.image-field-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.image-field-preview {
+  width: 120px;
+  max-height: 160px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #161616;
+  border: 1px solid rgba(255, 200, 49, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.image-field-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-field-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 140px;
+}
+
+.image-field-url summary {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.image-field-url summary:hover,
+.image-field-url summary:focus-visible {
+  color: var(--accent-primary);
+}
+
+.image-crop-overlay {
+  z-index: 1100;
+}
+
+.image-crop-card {
+  width: auto;
+  max-width: calc(100vw - 32px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.image-crop-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 2px solid var(--accent-primary);
+  background: #0d0d0d;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  margin: 8px auto 16px;
+}
+
+.image-crop-frame:active {
+  cursor: grabbing;
+}
+
+.image-crop-frame:focus-visible {
+  outline: 3px solid rgba(255, 200, 49, 0.6);
+  outline-offset: 2px;
+}
+
+.image-crop-frame img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.image-crop-zoom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  margin-bottom: 12px;
+}
+
+.image-crop-zoom input {
+  flex: 1;
+  accent-color: var(--accent-primary);
+}

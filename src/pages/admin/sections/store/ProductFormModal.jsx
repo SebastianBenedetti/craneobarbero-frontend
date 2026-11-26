@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { createProduct, updateProduct } from "../../../../services/store.services";
 import { backdropClose } from "../../../../utils/backdrop";
-import { IMAGE_URL_HINT, IMAGE_URL_PATTERN } from "../../../../utils/image";
 import { formatMoney } from "../../../../utils/format";
 import { INPUT_CLASS, SELECT_CLASS, textOrNull, toNumberOrNull } from "./shared";
+import ImageField from "../../../../components/ImageField/ImageField";
 
 const fromProduct = (p) => ({
   categoryId: p?.categoryId ?? "",
@@ -122,23 +122,7 @@ function ProductFormModal({ product, categories, suppliers, onClose, onSaved }) 
               <textarea id="product-description" name="description" rows={2} className={INPUT_CLASS} value={form.description} onChange={change} maxLength={500} placeholder="Opcional" />
             </div>
             <div className="store-form-full">
-              <label htmlFor="product-image" className="admin-form-label">Imagen</label>
-              <input
-                id="product-image"
-                name="imageUrl"
-                type="text"
-                inputMode="url"
-                pattern={IMAGE_URL_PATTERN}
-                title={IMAGE_URL_HINT}
-                className={INPUT_CLASS}
-                value={form.imageUrl}
-                onChange={change}
-                maxLength={500}
-                placeholder="URL de imagen (opcional)"
-              />
-              {form.imageUrl && (
-                <img src={form.imageUrl} alt="Vista previa del producto" className="store-image-preview" onError={(e) => { e.target.style.display = "none"; }} />
-              )}
+              <ImageField id="product-image" label="Imagen" value={form.imageUrl} onChange={change} aspect={4 / 3} labelClassName="admin-form-label" inputClassName={INPUT_CLASS} />
             </div>
             <label className="store-check store-form-full">
               <input type="checkbox" name="isActive" checked={form.isActive} onChange={change} />
