@@ -7,7 +7,7 @@ function BarberList({ barbers, onSelectBarber }) {
 
   const mapedBarbers = barbers.map((barber) => {
     return (
-      <div className="col-md-2" key={barber.id}>
+      <div className="col-6 col-sm-4 col-lg-3 col-xl-2" key={barber.id}>
         <BarberCard
           barber={barber}
           isSelected={selected === barber.id}
