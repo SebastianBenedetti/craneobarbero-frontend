@@ -5,8 +5,10 @@ import { getAllAppointmentsAdminService } from "../../services/admin.services";
 import { getAllUsersService } from "../../services/admin.services";
 import { getAllBranchesAdminService } from "../../services/admin.services";
 import { getAdminSummary } from "../../services/reports.services";
+import { getStockAlerts } from "../../services/store.services";
 import { todayKey, addDays, monthRange } from "../../utils/dates";
 import "../../styles/adminDashboard.css";
+import "../../styles/store.css";
 
 // pagina de inicio del admin con estadisticas generales del negocio
 function AdminDashboardPage() {
@@ -17,6 +19,11 @@ function AdminDashboardPage() {
   const [users, setUsers] = useState([]);
   const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [stockAlerts, setStockAlerts] = useState(null);
+
+  useEffect(() => {
+    getStockAlerts().then(setStockAlerts).catch(() => setStockAlerts(null));
+  }, []);
 
   useEffect(() => {
     document.title = " Inicio | Panel Admin";
@@ -159,6 +166,19 @@ function AdminDashboardPage() {
             </select>
           </div>
 
+          {stockAlerts?.count > 0 && (
+            <div className="store-alert" role="status">
+              <div>
+                <strong>Stock bajo en {stockAlerts.count === 1 ? "1 producto" : `${stockAlerts.count} productos`}:</strong>{" "}
+                {stockAlerts.items.slice(0, 5).map((item) => `${item.name} (${item.stock}/${item.minStock})`).join(", ")}
+                {stockAlerts.count > 5 && "…"}
+              </div>
+              <button className="btn btn-sm btn-warning text-dark" onClick={() => navigate("/admin/store?tab=reorder")}>
+                Ver para reponer
+              </button>
+            </div>
+          )}
+
           {/* primera fila: numeros mas importantes */}
           <section className="admin-stats-grid">
             <div className="admin-stat-card">
@@ -282,6 +302,12 @@ function AdminDashboardPage() {
                 onClick={() => navigate("/admin/manage?tab=appointments")}
               >
                 Turnos
+              </button>
+              <button
+                className="admin-quick-btn"
+                onClick={() => navigate("/admin/store")}
+              >
+                Tienda y stock
               </button>
             </div>
           </section>
