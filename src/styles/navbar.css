@@ -97,6 +97,8 @@
 }
 
 .navbar-account-btn {
+  white-space: nowrap;
+  max-width: 200px;
   background: none;
   border: none;
   color: var(--text-primary);
@@ -108,6 +110,11 @@
   gap: 4px;
   transition: color 0.2s ease;
   font-family: inherit;
+}
+
+.navbar-account-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .navbar-account-btn:hover {
@@ -284,122 +291,121 @@
   }
 }
 
-@media (max-width: 991.98px) {
-  .custom-navbar {
-    padding: 1rem 1.25rem;
-  }
-
-  .navbar-panel-label {
-    align-self: flex-start;
-    margin-right: 0;
-    padding-top: 4px;
-  }
-
-  .navbar-title {
-    font-size: 1.25rem;
-  }
-
-  .navbar-hamburger {
-    display: flex;
-  }
-
-  .navbar-links {
-    display: none;
-    position: fixed;
-    top: calc(100% + 1px);
-    left: 0;
-    right: 0;
-    background-color: rgba(13, 13, 13, 0.97);
-    backdrop-filter: blur(16px);
-    flex-direction: column;
-    padding: 0.5rem 1.5rem 1rem;
-    gap: 0;
-    max-height: calc(100dvh - 61px);
-    overflow-y: auto;
-    border-bottom: 1px solid var(--accent-primary);
-    z-index: 999;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  }
-
-  .navbar-links.navbar-links-open {
-    display: flex;
-  }
-
-  .navbar-links a {
-    font-size: 1rem;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    width: 100%;
-  }
-
-  .navbar-links a:last-of-type {
-    border-bottom: none;
-  }
-
-  .navbar-links a.navbar-cta {
-    align-self: flex-start;
-    width: auto;
-    margin: 6px 0;
-    padding: 9px 24px;
-    border-bottom: none;
-    justify-content: center;
-  }
-
-  .navbar-account {
-    width: 100%;
-    padding: 6px 0;
-  }
-
-  .navbar-account-btn {
-    font-size: 1rem;
-    padding: 4px 0;
-  }
-
-  .navbar-dropdown {
-    position: static;
-    box-shadow: none;
-    border: 1px solid rgba(255, 200, 49, 0.2);
-    border-radius: 8px;
-    margin-top: 6px;
-    animation: none;
-  }
-
-  .navbar-links .navbar-dropdown a {
-    padding: 9px 20px;
-    font-size: 0.95rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  }
-
-  .navbar-links .navbar-dropdown a:last-of-type {
-    border-bottom: none;
-  }
-
-  .navbar-dropdown-logout {
-    font-size: 0.95rem;
-    padding: 9px 20px;
-  }
-
-  body.nav-menu-open .fab-appointment,
-  body.nav-menu-open .assistant-fab,
-  body.nav-menu-open .assistant-window {
-    display: none;
-  }
-
-  .navbar-barber-session {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 0;
-    width: 100%;
-  }
-
-  .navbar-link-active {
-    padding: 0;
-    background: none;
-    color: var(--accent-primary);
-  }
+.custom-navbar.navbar-collapsed {
+  padding: 1rem 1.25rem;
 }
+
+.custom-navbar.navbar-collapsed .navbar-panel-label {
+  align-self: flex-start;
+  margin-right: 0;
+  padding-top: 4px;
+}
+
+.custom-navbar.navbar-collapsed .navbar-title {
+  font-size: 1.25rem;
+}
+
+.custom-navbar.navbar-collapsed .navbar-hamburger {
+  display: flex;
+}
+
+.custom-navbar.navbar-collapsed .navbar-links {
+  display: none;
+  position: fixed;
+  top: calc(100% + 1px);
+  left: 0;
+  right: 0;
+  background-color: rgba(13, 13, 13, 0.97);
+  backdrop-filter: blur(16px);
+  flex-direction: column;
+  padding: 0.5rem 1.5rem 1rem;
+  gap: 0;
+  max-height: calc(100dvh - 61px);
+  overflow-y: auto;
+  border-bottom: 1px solid var(--accent-primary);
+  z-index: 999;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.custom-navbar.navbar-collapsed .navbar-links.navbar-links-open {
+  display: flex;
+}
+
+.custom-navbar.navbar-collapsed .navbar-links a {
+  font-size: 1rem;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  width: 100%;
+}
+
+.custom-navbar.navbar-collapsed .navbar-links a:last-of-type {
+  border-bottom: none;
+}
+
+.custom-navbar.navbar-collapsed .navbar-links a.navbar-cta {
+  align-self: flex-start;
+  width: auto;
+  margin: 6px 0;
+  padding: 9px 24px;
+  border-bottom: none;
+  justify-content: center;
+}
+
+.custom-navbar.navbar-collapsed .navbar-account {
+  width: 100%;
+  padding: 6px 0;
+}
+
+.custom-navbar.navbar-collapsed .navbar-account-btn {
+  font-size: 1rem;
+  padding: 4px 0;
+}
+
+.custom-navbar.navbar-collapsed .navbar-dropdown {
+  position: static;
+  box-shadow: none;
+  border: 1px solid rgba(255, 200, 49, 0.2);
+  border-radius: 8px;
+  margin-top: 6px;
+  animation: none;
+}
+
+.custom-navbar.navbar-collapsed .navbar-links .navbar-dropdown a {
+  padding: 9px 20px;
+  font-size: 0.95rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.custom-navbar.navbar-collapsed .navbar-links .navbar-dropdown a:last-of-type {
+  border-bottom: none;
+}
+
+.custom-navbar.navbar-collapsed .navbar-dropdown-logout {
+  font-size: 0.95rem;
+  padding: 9px 20px;
+}
+
+body.nav-menu-open .fab-appointment,
+body.nav-menu-open .assistant-fab,
+body.nav-menu-open .assistant-window {
+  display: none;
+}
+
+.custom-navbar.navbar-collapsed .navbar-barber-session {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.custom-navbar.navbar-collapsed .navbar-link-active {
+  padding: 0;
+  background: none;
+  color: var(--accent-primary);
+}
+
 
 @media (max-width: 374.98px) {
   .custom-navbar {

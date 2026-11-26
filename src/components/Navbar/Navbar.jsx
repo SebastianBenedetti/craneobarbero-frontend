@@ -1,15 +1,33 @@
 import "../../styles/navbar.css";
 import { Link, useLocation } from "react-router";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useSyncExternalStore } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import useCart from "../../hooks/useCart";
+
+const COLLAPSE_QUERY = {
+  barber: "(max-width: 1279.98px)",
+  default: "(max-width: 991.98px)",
+};
+
+function useMediaQuery(query) {
+  return useSyncExternalStore(
+    (onChange) => {
+      const media = window.matchMedia(query);
+      media.addEventListener("change", onChange);
+      return () => media.removeEventListener("change", onChange);
+    },
+    () => window.matchMedia(query).matches,
+  );
+}
 
 function Navbar() {
   const { user, logout } = useAuth();
   const { count: cartCount } = useCart();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuState, setMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const collapsed = useMediaQuery(COLLAPSE_QUERY[user?.role] ?? COLLAPSE_QUERY.default);
+  const menuOpen = collapsed && menuState;
   const location = useLocation();
   const isActive = (path) =>
     location.pathname === path ? "navbar-link-active" : "";
@@ -47,7 +65,7 @@ function Navbar() {
   };
 
   return (
-    <nav className="custom-navbar">
+    <nav className={`custom-navbar${collapsed ? " navbar-collapsed" : ""}`}>
       <div className="navbar-brand">
         <span className="navbar-title">Barbería Cráneo Barbero</span>
       </div>
@@ -136,7 +154,7 @@ function Navbar() {
               className="navbar-account-btn"
               onClick={() => setDropdownOpen((v) => !v)}
             >
-              {user.name}{" "}
+              <span className="navbar-account-name">{user.name}</span>{" "}
               <span className="navbar-chevron">{dropdownOpen ? "▴" : "▾"}</span>
             </button>
             {dropdownOpen && (
@@ -180,7 +198,7 @@ function Navbar() {
               className="navbar-account-btn"
               onClick={() => setDropdownOpen((v) => !v)}
             >
-              Hola, {user.name}{" "}
+              <span className="navbar-account-name">Hola, {user.name}</span>{" "}
               <span className="navbar-chevron">{dropdownOpen ? "▴" : "▾"}</span>
             </button>
             {dropdownOpen && (
