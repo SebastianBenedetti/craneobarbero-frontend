@@ -16,7 +16,7 @@ const NEXT_STATUS = {
 
 const CANCELLABLE = ["pending_payment", "paid", "ready"];
 
-function OrdersSection() {
+function OrdersSection({ onStockChanged }) {
   const branches = useBranches();
   const [filters, setFilters] = useState({ status: "", branchId: "", from: "", to: "" });
   const [page, setPage] = useState(1);
@@ -156,6 +156,7 @@ function OrdersSection() {
             setCancelling(null);
             setToast({ message: refunded ? "Pedido cancelado con reembolso" : "Pedido cancelado", type: "success" });
             load();
+            onStockChanged?.();
           }}
         />
       )}

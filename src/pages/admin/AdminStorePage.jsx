@@ -88,7 +88,7 @@ function AdminStorePage() {
       case "suppliers":
         return <SuppliersSection suppliers={suppliers} onChanged={loadSuppliers} />;
       default:
-        return <OrdersSection />;
+        return <OrdersSection onStockChanged={loadAlerts} />;
     }
   };
 

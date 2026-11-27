@@ -107,7 +107,10 @@ function ProductFormModal({ product, categories, suppliers, onClose, onSaved }) 
             </div>
             <div>
               <label htmlFor="product-reorder" className="admin-form-label">Cantidad a reponer</label>
-              <input id="product-reorder" name="reorderQuantity" type="number" min="1" step="1" className={INPUT_CLASS} value={form.reorderQuantity} onChange={change} placeholder="Opcional" />
+              <input id="product-reorder" name="reorderQuantity" type="number" min="1" step="1" className={INPUT_CLASS} value={form.reorderQuantity} onChange={change} placeholder="Opcional" aria-describedby="product-reorder-hint" />
+              <p id="product-reorder-hint" className="admin-form-hint">
+                Cuántas unidades conviene comprar cuando el stock llega al mínimo. Se usa en "Para reponer" para sugerir la cantidad y el costo estimado, y se precarga al registrar la compra.
+              </p>
             </div>
             <div>
               <label htmlFor="product-sku" className="admin-form-label">SKU</label>
