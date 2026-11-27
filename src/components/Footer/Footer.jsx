@@ -18,6 +18,7 @@ function Footer() {
             Inicio
           </Link>
           <Link to="/appointment">Sacar turno</Link>
+          <Link to="/shop">Tienda</Link>
           <Link to="/about">Nosotros</Link>
           <Link to="/terms">Términos y condiciones</Link>
           <Link to="/privacy">Política de privacidad</Link>
