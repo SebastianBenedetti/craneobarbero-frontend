@@ -4,6 +4,7 @@ import "../../styles/assistant.css";
 import { sendAssistantMessage } from "../../services/assistant.services";
 import { resendVerificationEmail } from "../../services/appointments.services";
 import { formatMoney } from "../../utils/format";
+import { useTapToReveal } from "../../hooks/useTapToReveal";
 
 const AVATAR = "\u{1F469}\u{1F3FD}‍\u{1F4BB}";
 const MAX_LENGTH = 300;
@@ -48,7 +49,7 @@ function SummaryCard({ summary }) {
 }
 
 const GUEST_GREETING =
-  "¡Hola! Soy el asistente de Cráneo Barbero. Te ayudo a sacar un turno en un minuto.\nPara reservar necesitás una cuenta: iniciá sesión o creá una y te espero acá.";
+  "¡Hola! Soy la asistente de Cráneo Barbero. Te ayudo a sacar un turno en un minuto o te llevo a la tienda.\nPara reservar necesitás una cuenta: iniciá sesión o creá una y te espero acá.";
 
 function BookingAssistant({ bottomOffset = false, guest = false }) {
   const location = useLocation();
@@ -116,6 +117,8 @@ function BookingAssistant({ bottomOffset = false, guest = false }) {
     fabRef.current?.focus();
   };
 
+  const fab = useTapToReveal(() => openAssistant());
+
   const startAfterLogin = useEffectEvent(() => {
     if (!started.current) {
       started.current = true;
@@ -134,7 +137,18 @@ function BookingAssistant({ bottomOffset = false, guest = false }) {
     navigate(`/shop?product=${productId}`);
   };
 
+  const goToShop = () => {
+    setOpen(false);
+    navigate("/shop");
+  };
+
+  useEffect(() => {
+    document.body.classList.toggle("assistant-open", open);
+    return () => document.body.classList.remove("assistant-open");
+  }, [open]);
+
   const goToLogin = (view) => {
+    setOpen(false);
     navigate("/login", {
       state: { from: `${location.pathname}${location.search}`, openAssistant: true, view },
     });
@@ -166,6 +180,10 @@ function BookingAssistant({ bottomOffset = false, guest = false }) {
       talk(option.request);
       return;
     }
+    if (option.value === "shop") {
+      goToShop();
+      return;
+    }
     talk({ choice: option.value }, option.label);
   };
 
@@ -193,8 +211,9 @@ function BookingAssistant({ bottomOffset = false, guest = false }) {
         <button
           ref={fabRef}
           type="button"
-          className={`assistant-fab${bottomOffset ? " assistant-fab--stacked" : ""}`}
-          onClick={openAssistant}
+          className={`assistant-fab${bottomOffset ? " assistant-fab--stacked" : ""}${fab.revealed ? " is-revealed" : ""}`}
+          onPointerDown={fab.onPointerDown}
+          onClick={fab.onClick}
           aria-label="Abrir el asistente de reservas"
           title="Asistente de reservas"
         >
@@ -280,6 +299,9 @@ function BookingAssistant({ bottomOffset = false, guest = false }) {
                 </button>
                 <button type="button" className="assistant-option" onClick={() => goToLogin("register")}>
                   Crear cuenta
+                </button>
+                <button type="button" className="assistant-option" onClick={goToShop}>
+                  Ver la tienda
                 </button>
               </div>
             )}

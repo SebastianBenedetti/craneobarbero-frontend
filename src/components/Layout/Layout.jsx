@@ -4,11 +4,13 @@ import Navbar from "../Navbar/Navbar";
 import Footer from "../Footer/Footer";
 import BookingAssistant from "../BookingAssistant/BookingAssistant";
 import { useAuth } from "../../hooks/useAuth";
+import { useTapToReveal } from "../../hooks/useTapToReveal";
 
 function Layout() {
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const fab = useTapToReveal(() => navigate("/appointment"));
   const showFab =
     user?.role !== "admin" &&
     user?.role !== "barber" &&
@@ -23,8 +25,9 @@ function Layout() {
       {user?.role !== "barber" && user?.role !== "admin" && <Footer />}
       {showFab && (
         <button
-          className="fab-appointment"
-          onClick={() => navigate("/appointment")}
+          className={`fab-appointment${fab.revealed ? " is-revealed" : ""}`}
+          onPointerDown={fab.onPointerDown}
+          onClick={fab.onClick}
           title="Sacar turno"
           aria-label="Sacar turno"
         >
