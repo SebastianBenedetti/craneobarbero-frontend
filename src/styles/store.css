@@ -552,7 +552,7 @@
 
 @media (max-width: 991.98px) {
   .shop-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .shop-cart {
