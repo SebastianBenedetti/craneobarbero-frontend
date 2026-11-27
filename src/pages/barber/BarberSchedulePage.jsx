@@ -71,14 +71,17 @@ function BarberSchedulePage() {
     new Date(dateStr).toLocaleTimeString("es-AR", {
       hour: "2-digit",
       minute: "2-digit",
+      hour12: false,
     });
 
-  const formatDayTitle = (date) =>
-    date.toLocaleDateString("es-AR", {
+  const formatDayTitle = (date) => {
+    const text = date.toLocaleDateString("es-AR", {
       weekday: "long",
       day: "numeric",
       month: "long",
     });
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  };
 
   return (
     <div className="barber-dashboard page-transition">

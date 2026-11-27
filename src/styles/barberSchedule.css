@@ -119,7 +119,6 @@
   color: var(--text-secondary);
   font-size: 0.85rem;
   min-width: 160px;
-  text-transform: capitalize;
 }
 
 /* ===== PAGINADO ===== */
