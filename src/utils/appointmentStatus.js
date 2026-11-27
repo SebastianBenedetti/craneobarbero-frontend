@@ -14,7 +14,12 @@ export function appointmentStatus(appointment, { forClient = false } = {}) {
   if (status === "pending") {
     return paymentStatus === "paid"
       ? { tone: "paid", label: "Abonado" }
-      : { tone: "unpaid", label: "Pendiente de abonar" };
+      : {
+          tone: "unpaid",
+          label: appointment.paymentMethod === "cash" && appointment.createdByRole === "client"
+            ? forClient ? "Pagás en el local" : "Paga en el local"
+            : "Pendiente de abonar",
+        };
   }
   if (status === "completed") return { tone: "completed", label: "Completado" };
   if (status === "expired") return { tone: "expired", label: "Expirado (no se pagó a tiempo)" };

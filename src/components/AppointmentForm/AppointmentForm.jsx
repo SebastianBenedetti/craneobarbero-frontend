@@ -16,6 +16,8 @@ function AppointmentForm({ branch, barber, day, hours, cut, branches, barbers, c
   const [confirmError, setConfirmError] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [resendState, setResendState] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("mercadopago");
+  const cash = paymentMethod === "cash";
 
   const selectedBranch = branches.find((b) => b.id === branch);
   const selectedBarber = barbers.find((barb) => barb.id === barber);
@@ -29,7 +31,7 @@ function AppointmentForm({ branch, barber, day, hours, cut, branches, barbers, c
     setConfirmError(null);
     setConfirmLoading(true);
     try {
-      const data = await bookAppointment(barber, cut, hours.startAt);
+      const data = await bookAppointment(barber, cut, hours.startAt, paymentMethod);
       if (data.checkoutUrl) {
         window.location.assign(data.checkoutUrl);
         return;
@@ -94,9 +96,23 @@ function AppointmentForm({ branch, barber, day, hours, cut, branches, barbers, c
         <div className="text-light mb-1">
           Servicio: {selectedCut?.name} — ${Number(selectedCut?.price ?? 0).toLocaleString("es-AR")}
         </div>
-        <p className="text-secondary small mt-2 mb-0">
-          El turno se confirma al pagarlo con Mercado Pago. Tenés 30 minutos para completar el pago; si no, el horario se libera.
-        </p>
+        <fieldset className="appointment-payment mt-3" disabled={Boolean(result) || confirmLoading}>
+          <legend className="text-warning small mb-2">¿Cómo querés pagar?</legend>
+          <label className="appointment-payment-option">
+            <input type="radio" name="paymentMethod" value="mercadopago" checked={!cash} onChange={() => setPaymentMethod("mercadopago")} />
+            <span>
+              <strong>Ahora con Mercado Pago</strong>
+              <span className="d-block text-secondary small">El turno se confirma al pagarlo. Tenés 30 minutos; si no, el horario se libera.</span>
+            </span>
+          </label>
+          <label className="appointment-payment-option">
+            <input type="radio" name="paymentMethod" value="cash" checked={cash} onChange={() => setPaymentMethod("cash")} />
+            <span>
+              <strong>En efectivo en el local</strong>
+              <span className="d-block text-secondary small">El turno queda confirmado ya y lo pagás el día del turno.</span>
+            </span>
+          </label>
+        </fieldset>
 
         {confirmError && (
           <div className="alert alert-danger py-2 mt-3" style={{ fontSize: "0.85rem" }} role="alert">
@@ -117,8 +133,10 @@ function AppointmentForm({ branch, barber, day, hours, cut, branches, barbers, c
         )}
 
         {result ? (
-          <div className="alert alert-warning mt-3 mb-0" role="status">
-            Reservamos el horario, pero no pudimos abrir el pago en este momento. Entrá a "Mis turnos" y tocá "Pagar" para completarlo.
+          <div className={`alert ${result.paymentMethod === "cash" ? "alert-success" : "alert-warning"} mt-3 mb-0`} role="status">
+            {result.paymentMethod === "cash"
+              ? "¡Listo! Tu turno quedó confirmado. Lo pagás en efectivo en el local el día del turno. Te mandamos un mail con los datos."
+              : 'Reservamos el horario, pero no pudimos abrir el pago en este momento. Entrá a "Mis turnos" y tocá "Pagar" para completarlo.'}
             <div className="mt-2">
               <button className="btn btn-sm btn-dark" onClick={() => navigate("/my-account/appointments")}>Ir a Mis turnos</button>
             </div>
@@ -129,7 +147,7 @@ function AppointmentForm({ branch, barber, day, hours, cut, branches, barbers, c
             onClick={handleConfirm}
             disabled={confirmLoading}
           >
-            {confirmLoading ? "Abriendo el pago…" : "Confirmar y pagar"}
+            {confirmLoading ? (cash ? "Confirmando…" : "Abriendo el pago…") : cash ? "Confirmar turno" : "Confirmar y pagar"}
           </button>
         )}
       </div>

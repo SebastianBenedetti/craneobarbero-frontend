@@ -30,3 +30,32 @@
     padding-top: 80px;
   }
 }
+
+.appointment-payment {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.appointment-payment-option {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 200, 49, 0.25);
+  border-radius: 10px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.appointment-payment-option:has(input:checked) {
+  border-color: var(--accent-primary);
+  background: rgba(255, 200, 49, 0.08);
+}
+
+.appointment-payment-option input {
+  margin-top: 4px;
+  accent-color: var(--accent-primary);
+}
