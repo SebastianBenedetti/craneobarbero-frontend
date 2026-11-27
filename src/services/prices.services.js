@@ -25,5 +25,8 @@ export const revertPriceAdjustment = (id) =>
 export const getProductCategories = () =>
   apiRequest("/categories", { fallbackError: "No se pudieron cargar las categorías" });
 
+export const getActiveCuts = () =>
+  apiRequest("/cuts", { fallbackError: "No se pudieron cargar los servicios" });
+
 export const getAdminProducts = () =>
   apiRequest("/products?active=true", { fallbackError: "No se pudieron cargar los productos" });

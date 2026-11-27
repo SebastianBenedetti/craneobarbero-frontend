@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   applyPriceAdjustment,
+  getActiveCuts,
   getAdminProducts,
   getInflationSuggestion,
   getProductCategories,
@@ -19,6 +20,9 @@ const ROUNDING_OPTIONS = [
 function PriceAdjustmentForm({ onApplied, onError }) {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
+  const [cuts, setCuts] = useState([]);
+  const [cutIds, setCutIds] = useState([]);
+  const [direction, setDirection] = useState("up");
   const [scopeType, setScopeType] = useState("all");
   const [categoryId, setCategoryId] = useState("");
   const [productIds, setProductIds] = useState([]);
@@ -37,6 +41,7 @@ function PriceAdjustmentForm({ onApplied, onError }) {
     .then((data) => {
       setSuggestion(data);
       if (data.available) {
+        setDirection("up");
         setPercentage(String(data.percentage));
         setPeriod({ from: data.from, to: data.to });
       }
@@ -45,10 +50,11 @@ function PriceAdjustmentForm({ onApplied, onError }) {
     .finally(() => setSuggesting(false)), []);
 
   useEffect(() => {
-    Promise.all([getProductCategories(), getAdminProducts()])
-      .then(([categoryList, productList]) => {
+    Promise.all([getProductCategories(), getAdminProducts(), getActiveCuts()])
+      .then(([categoryList, productList, cutList]) => {
         setCategories(categoryList);
         setProducts(productList);
+        setCuts(cutList);
       })
       .catch((err) => onError(err.message));
     showSuggestion(getInflationSuggestion());
@@ -64,20 +70,32 @@ function PriceAdjustmentForm({ onApplied, onError }) {
     setFormError("");
   };
 
+  const fromInflation = direction === "up" && suggestion?.available && Number(percentage) === suggestion.percentage;
+  const decrease = direction === "down";
+
   const buildBody = () => ({
     scopeType,
     categoryId: scopeType === "category" ? Number(categoryId) || null : null,
     productIds: scopeType === "selection" ? productIds : null,
-    includeCuts,
-    percentage: Number(String(percentage).replace(",", ".")),
+    cutIds: scopeType === "selection" ? cutIds : null,
+    includeCuts: scopeType !== "selection" && includeCuts,
+    percentage: Number(String(percentage).replace(",", ".")) * (decrease ? -1 : 1),
     rounding,
-    source: suggestion?.available && Number(percentage) === suggestion.percentage ? "indec_api" : "manual",
-    periodFrom: suggestion?.available && Number(percentage) === suggestion.percentage ? suggestion.from : null,
-    periodTo: suggestion?.available && Number(percentage) === suggestion.percentage ? suggestion.to : null,
+    source: fromInflation ? "indec_api" : "manual",
+    periodFrom: fromInflation ? suggestion.from : null,
+    periodTo: fromInflation ? suggestion.to : null,
   });
 
   const handlePreview = async (e) => {
     e.preventDefault();
+    if (preview) {
+      setPreview(null);
+      return;
+    }
+    if (scopeType === "selection" && productIds.length === 0 && cutIds.length === 0) {
+      setFormError("Elegí al menos un producto o un servicio.");
+      return;
+    }
     setLoading(true);
     setFormError("");
     try {
@@ -109,10 +127,15 @@ function PriceAdjustmentForm({ onApplied, onError }) {
     setProductIds((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]));
   };
 
+  const toggleCut = (id) => {
+    resetPreview();
+    setCutIds((prev) => (prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]));
+  };
+
   return (
     <div className="admin-section">
       <div className="admin-section-header">
-        <h2 className="admin-section-title">Actualizar por inflación</h2>
+        <h2 className="admin-section-title">Actualizar precios</h2>
       </div>
 
       <form onSubmit={handlePreview} className="prices-form">
@@ -122,7 +145,7 @@ function PriceAdjustmentForm({ onApplied, onError }) {
             {[
               { value: "all", label: "Todos los productos" },
               { value: "category", label: "Una categoría" },
-              { value: "selection", label: "Productos seleccionados" },
+              { value: "selection", label: "Elegir productos y servicios" },
             ].map((option) => (
               <label key={option.value} className="prices-option">
                 <input
@@ -150,25 +173,45 @@ function PriceAdjustmentForm({ onApplied, onError }) {
             )}
 
             {scopeType === "selection" && (
-              <div className="prices-product-list" role="group" aria-label="Productos">
-                {products.length === 0 && <p className="text-secondary mb-0">No hay productos activos.</p>}
-                {products.map((p) => (
-                  <label key={p.id} className="prices-option">
-                    <input type="checkbox" checked={productIds.includes(p.id)} onChange={() => toggleProduct(p.id)} />
-                    {p.name} <span className="text-secondary">({formatMoney(p.salePrice)})</span>
-                  </label>
-                ))}
+              <div className="prices-product-list">
+                <div role="group" aria-label="Servicios">
+                  <p className="prices-list-title">Servicios</p>
+                  {cuts.map((c) => (
+                    <label key={c.id} className="prices-option">
+                      <input type="checkbox" checked={cutIds.includes(c.id)} onChange={() => toggleCut(c.id)} />
+                      {c.name} <span className="text-secondary">({formatMoney(c.price)})</span>
+                    </label>
+                  ))}
+                </div>
+                <div role="group" aria-label="Productos">
+                  <p className="prices-list-title">Productos</p>
+                  {products.length === 0 && <p className="text-secondary mb-0">No hay productos activos.</p>}
+                  {products.map((p) => (
+                    <label key={p.id} className="prices-option">
+                      <input type="checkbox" checked={productIds.includes(p.id)} onChange={() => toggleProduct(p.id)} />
+                      {p.name} <span className="text-secondary">({formatMoney(p.salePrice)})</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             )}
 
-            <label className="prices-option mt-2">
-              <input type="checkbox" checked={includeCuts} onChange={(e) => { setIncludeCuts(e.target.checked); resetPreview(); }} />
-              Incluir los servicios (cortes)
-            </label>
+            {scopeType !== "selection" && (
+              <label className="prices-option mt-2">
+                <input type="checkbox" checked={includeCuts} onChange={(e) => { setIncludeCuts(e.target.checked); resetPreview(); }} />
+                Incluir los servicios (cortes)
+              </label>
+            )}
           </fieldset>
 
           <fieldset className="prices-card">
-            <legend className="admin-form-label">2. Cuánto aumentar</legend>
+            <legend className="admin-form-label">2. Cuánto ajustar</legend>
+            <div className="store-segmented mb-3" role="radiogroup" aria-label="Tipo de ajuste">
+              <button type="button" role="radio" aria-checked={direction === "up"} className={direction === "up" ? "active" : ""}
+                onClick={() => { setDirection("up"); resetPreview(); }}>Aumentar</button>
+              <button type="button" role="radio" aria-checked={direction === "down"} className={direction === "down" ? "active" : ""}
+                onClick={() => { setDirection("down"); resetPreview(); }}>Bajar</button>
+            </div>
             <div className="prices-period">
               <label className="admin-form-hint" htmlFor="period-from">Desde</label>
               <input
@@ -204,12 +247,12 @@ function PriceAdjustmentForm({ onApplied, onError }) {
               </p>
             )}
 
-            <label className="admin-form-label" htmlFor="percentage">Porcentaje de aumento (%)</label>
+            <label className="admin-form-label" htmlFor="percentage">{decrease ? "Porcentaje de baja (%)" : "Porcentaje de aumento (%)"}</label>
             <input
               id="percentage"
               type="number"
               min="0.0001"
-              max="100"
+              max={decrease ? "99.9999" : "100"}
               step="0.0001"
               className="form-control bg-secondary text-white border-secondary"
               value={percentage}
@@ -227,13 +270,15 @@ function PriceAdjustmentForm({ onApplied, onError }) {
             >
               {ROUNDING_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
-            <p className="admin-form-hint">El redondeo siempre es hacia arriba. El costo de los productos no cambia.</p>
+            <p className="admin-form-hint">
+              {decrease ? "En una baja el redondeo es hacia abajo." : "En un aumento el redondeo es hacia arriba."} El costo de los productos no cambia.
+            </p>
           </fieldset>
         </div>
 
         {formError && <p className="text-danger mt-2">{formError}</p>}
-        <button type="submit" className="btn btn-warning text-dark mt-2" disabled={loading}>
-          {loading && !preview ? "Calculando..." : "Ver vista previa"}
+        <button type="submit" className={`btn mt-2 ${preview ? "btn-outline-warning" : "btn-warning text-dark"}`} disabled={loading} aria-expanded={Boolean(preview)}>
+          {loading && !preview ? "Calculando..." : preview ? "Ocultar vista previa" : "Ver vista previa"}
         </button>
       </form>
 
@@ -265,16 +310,18 @@ function PriceAdjustmentForm({ onApplied, onError }) {
                         </td>
                         <td>{formatMoney(item.currentPrice)}</td>
                         <td className="text-warning">{formatMoney(item.newPrice)}</td>
-                        <td>+{formatMoney(item.difference)}</td>
+                        <td>{item.difference > 0 ? "+" : "−"}{formatMoney(Math.abs(item.difference))}</td>
                         <td>{item.marginPercent === null || item.marginPercent === undefined ? "—" : formatPercent(item.marginPercent)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-              <button type="button" className="btn btn-warning text-dark" disabled={loading} onClick={() => setConfirming(true)}>
-                {loading ? "Aplicando..." : "Aplicar aumento"}
-              </button>
+              <div className="prices-apply">
+                <button type="button" className="btn btn-warning text-dark" disabled={loading} onClick={() => setConfirming(true)}>
+                  {loading ? "Aplicando..." : preview.percentage < 0 ? "Aplicar baja" : "Aplicar aumento"}
+                </button>
+              </div>
             </>
           )}
         </div>
@@ -282,8 +329,8 @@ function PriceAdjustmentForm({ onApplied, onError }) {
 
       {confirming && preview && (
         <ConfirmModal
-          title="Confirmar aumento"
-          message={`Vas a modificar ${preview.itemsCount} ${preview.itemsCount === 1 ? "precio" : "precios"} con un aumento de ${formatPercent(preview.percentage)}. ¿Confirmás?`}
+          title={preview.percentage < 0 ? "Confirmar baja" : "Confirmar aumento"}
+          message={`Vas a modificar ${preview.itemsCount} ${preview.itemsCount === 1 ? "precio" : "precios"} con ${preview.percentage < 0 ? "una baja" : "un aumento"} de ${formatPercent(Math.abs(preview.percentage))}. ¿Confirmás?`}
           confirmLabel="Sí, aplicar"
           confirmClass="btn btn-warning text-dark"
           onConfirm={handleApply}
