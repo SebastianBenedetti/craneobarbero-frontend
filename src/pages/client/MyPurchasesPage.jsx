@@ -25,7 +25,7 @@ function MyPurchasesPage() {
   const [actionError, setActionError] = useState(null);
 
   useEffect(() => {
-    document.title = " Mis compras | Cráneo Barbero";
+    document.title = "Mis compras | Cráneo Barbero";
   }, []);
 
   const load = useCallback(() => {

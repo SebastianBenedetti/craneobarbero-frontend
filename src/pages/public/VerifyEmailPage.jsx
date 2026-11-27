@@ -14,7 +14,7 @@ function VerifyEmailPage() {
   const sent = useRef(false);
 
   useEffect(() => {
-    document.title = " Verificar email | Cráneo Barbero";
+    document.title = "Verificar email | Cráneo Barbero";
   }, []);
 
   useEffect(() => {

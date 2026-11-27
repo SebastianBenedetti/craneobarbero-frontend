@@ -122,7 +122,7 @@ function MyAccountPage() {
   const [resending, setResending] = useState(false);
 
   useEffect(() => {
-    document.title = " Mi cuenta | Cráneo Barbero";
+    document.title = "Mi cuenta | Cráneo Barbero";
     getMe().then(setMe).catch((err) => setLoadError(err.message));
   }, []);
 

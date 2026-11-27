@@ -23,11 +23,29 @@
   bottom: calc(2rem + 76px);
 }
 
-.assistant-fab:hover,
+.assistant-fab.is-revealed,
 .assistant-fab:focus-visible {
   animation: none;
   padding: 0 16px 0 20px;
   box-shadow: 0 6px 24px rgba(255, 200, 49, 0.55);
+}
+
+@media (hover: hover) {
+  .assistant-fab:hover {
+    animation: none;
+    padding: 0 16px 0 20px;
+    box-shadow: 0 6px 24px rgba(255, 200, 49, 0.55);
+  }
+
+  .assistant-fab:hover .assistant-fab-label {
+    max-width: 130px;
+    margin-right: 8px;
+    opacity: 1;
+  }
+}
+
+body.assistant-open .fab-appointment {
+  display: none;
 }
 
 .assistant-fab-label {
@@ -43,7 +61,7 @@
   transition: max-width 0.3s ease, margin-right 0.3s ease, opacity 0.2s ease 0.1s;
 }
 
-.assistant-fab:hover .assistant-fab-label,
+.assistant-fab.is-revealed .assistant-fab-label,
 .assistant-fab:focus-visible .assistant-fab-label {
   max-width: 130px;
   margin-right: 8px;
@@ -400,7 +418,8 @@
 @media (max-width: 768px) {
   .assistant-fab,
   .assistant-fab:hover,
-  .assistant-fab:focus-visible {
+  .assistant-fab:focus-visible,
+  .assistant-fab.is-revealed {
     right: 1.25rem;
     bottom: 1.5rem;
     height: 50px;
@@ -409,11 +428,12 @@
     padding: 0 12px;
   }
 
-  .assistant-fab-label,
-  .assistant-fab:hover .assistant-fab-label {
-    max-width: 0;
-    margin-right: 0;
-    opacity: 0;
+  .assistant-fab.is-revealed {
+    padding: 0 12px 0 16px;
+  }
+
+  .assistant-fab-label {
+    font-size: 0.72rem;
   }
 
   .assistant-fab-icon {
@@ -422,7 +442,8 @@
   }
 
   .assistant-fab--stacked,
-  .assistant-fab--stacked:hover {
+  .assistant-fab--stacked:hover,
+  .assistant-fab--stacked.is-revealed {
     bottom: calc(1.5rem + 62px);
   }
 }

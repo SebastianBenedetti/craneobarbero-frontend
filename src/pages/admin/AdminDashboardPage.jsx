@@ -27,7 +27,7 @@ function AdminDashboardPage() {
   }, []);
 
   useEffect(() => {
-    document.title = " Inicio | Panel Admin";
+    document.title = "Inicio | Panel Admin";
   }, []);
 
   // cargamos los tres recursos en paralelo al montar el componente

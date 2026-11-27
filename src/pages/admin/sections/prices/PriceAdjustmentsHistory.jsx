@@ -62,7 +62,7 @@ function PriceAdjustmentsHistory({ adjustments, loading, onReverted, onError }) 
               <tr>
                 <th>Fecha</th>
                 <th>Alcance</th>
-                <th>Aumento</th>
+                <th>Ajuste</th>
                 <th>Precios</th>
                 <th>Estado</th>
                 <th>Acciones</th>
@@ -82,7 +82,7 @@ function PriceAdjustmentsHistory({ adjustments, loading, onReverted, onError }) 
                     </td>
                     <td>{a.scopeDescription}</td>
                     <td>
-                      {formatPercent(a.percentage)}
+                      {a.percentage > 0 ? "+" : "−"}{formatPercent(Math.abs(a.percentage))}
                       <div className="admin-form-hint">
                         {a.source === "indec_api" ? `INDEC ${a.periodFrom === a.periodTo ? a.periodFrom : `${a.periodFrom} a ${a.periodTo}`}` : "Manual"} · {ROUNDING_LABELS[a.roundingMode] ?? a.roundingMode}
                       </div>

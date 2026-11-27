@@ -27,7 +27,7 @@ function PaymentReturnPage() {
   const [paying, setPaying] = useState(false);
 
   useEffect(() => {
-    document.title = " Pago | Cráneo Barbero";
+    document.title = "Pago | Cráneo Barbero";
   }, []);
 
   useEffect(() => {

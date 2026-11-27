@@ -14,7 +14,7 @@ function BarberReportsPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    document.title = " Mis reportes | Panel de barbero";
+    document.title = "Mis reportes | Panel de barbero";
   }, []);
 
   useEffect(() => {

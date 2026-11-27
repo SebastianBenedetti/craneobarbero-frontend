@@ -35,7 +35,7 @@ function AdminStorePage() {
   const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
-    document.title = " Tienda y stock | Panel Admin";
+    document.title = "Tienda y stock | Panel Admin";
   }, []);
 
   const loadCategories = useCallback(() => {
@@ -88,7 +88,7 @@ function AdminStorePage() {
       case "suppliers":
         return <SuppliersSection suppliers={suppliers} onChanged={loadSuppliers} />;
       default:
-        return <OrdersSection />;
+        return <OrdersSection onStockChanged={loadAlerts} />;
     }
   };
 

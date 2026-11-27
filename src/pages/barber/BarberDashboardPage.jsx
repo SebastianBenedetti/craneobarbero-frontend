@@ -23,7 +23,7 @@ function BarberDashboardPage() {
     setAppointments((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
 
   useEffect(() => {
-    document.title = " Inicio | Cráneo Barbero";
+    document.title = "Inicio | Cráneo Barbero";
   }, []);
 
   // cargamos los turnos del barbero al montar el componente

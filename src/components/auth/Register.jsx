@@ -10,6 +10,7 @@ import "../../styles/legal.css";
 import { useRef, useState } from "react";
 import { Link } from "react-router";
 import { registerService } from "./auth.services";
+import PasswordInput from "../PasswordInput/PasswordInput";
 import { isStrongPassword, PASSWORD_POLICY } from "../../utils/password";
 
 const Register = ({ onRegister, onCancel, subtitle = "Creá tu cuenta para confirmar el turno" }) => {
@@ -127,8 +128,7 @@ const Register = ({ onRegister, onCancel, subtitle = "Creá tu cuenta para confi
             </div>
 
             <div className="mb-3">
-                <input
-                    type="password"
+                <PasswordInput
                     required
                     ref={passwordRef}
                     placeholder="Contraseña (mínimo 8, con letras y números)"
@@ -144,8 +144,7 @@ const Register = ({ onRegister, onCancel, subtitle = "Creá tu cuenta para confi
             </div>
 
             <div className="mb-4">
-                <input
-                    type="password"
+                <PasswordInput
                     required
                     ref={confirmPasswordRef}
                     placeholder="Repetir contraseña"

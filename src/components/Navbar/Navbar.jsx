@@ -67,7 +67,7 @@ function Navbar() {
   return (
     <nav className={`custom-navbar${collapsed ? " navbar-collapsed" : ""}`}>
       <div className="navbar-brand">
-        <span className="navbar-title">Barbería Cráneo Barbero</span>
+        <Link to="/" className="navbar-title">Barbería Cráneo Barbero</Link>
       </div>
 
       <button
@@ -132,6 +132,9 @@ function Navbar() {
             <Link to="/admin/agenda" className={isActive("/admin/agenda")}>
               Agenda
             </Link>
+            <Link to="/admin/manage" className={isActive("/admin/manage")}>
+              Gestionar
+            </Link>
             <Link to="/admin/store" className={isActive("/admin/store")}>
               Tienda
             </Link>
@@ -140,9 +143,6 @@ function Navbar() {
             </Link>
             <Link to="/admin/reports" className={isActive("/admin/reports")}>
               Reportes
-            </Link>
-            <Link to="/admin/manage" className={isActive("/admin/manage")}>
-              Gestionar
             </Link>
           </>
         )}

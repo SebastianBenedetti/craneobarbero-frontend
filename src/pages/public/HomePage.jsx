@@ -13,7 +13,7 @@ function HomePage() {
   const { user } = useAuth();
   const [categories, setCategories] = useState([]);
   useEffect(() => {
-    document.title = " Inicio | Cráneo Barbero";
+    document.title = "Inicio | Cráneo Barbero";
   }, []);
 
   useEffect(() => {

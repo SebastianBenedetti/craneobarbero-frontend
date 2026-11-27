@@ -15,6 +15,10 @@ function LoginPage() {
   const [view, setView] = useState(location.state?.view === "register" ? "register" : "login");
 
   useEffect(() => {
+    document.title = `${view === "login" ? "Iniciar sesión" : "Crear cuenta"} | Cráneo Barbero`;
+  }, [view]);
+
+  useEffect(() => {
     if (!user) return;
     if (user.role === "barber") navigate("/barber", { replace: true });
     else if (user.role === "admin") navigate("/admin", { replace: true });

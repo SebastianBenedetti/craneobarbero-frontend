@@ -35,7 +35,7 @@ function AdminManagePage() {
   const [activeTab, setActiveTab] = useState(getInitialTab);
 
   useEffect(() => {
-    document.title = " Gestionar | Panel Admin";
+    document.title = "Gestionar | Panel Admin";
   }, []);
 
   if (!user) {

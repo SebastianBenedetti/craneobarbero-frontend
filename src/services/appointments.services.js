@@ -13,10 +13,10 @@ export const getMyAppointments = () => apiGetAllPages("/appointments/my", "No se
 
 export const getAppointment = (id) => apiRequest(`/appointments/${id}`, { fallbackError: "No se pudo cargar el turno" });
 
-export const bookAppointment = (barberId, cutId, appointmentDate) =>
+export const bookAppointment = (barberId, cutId, appointmentDate, paymentMethod = "mercadopago") =>
   apiRequest("/appointments", {
     method: "POST",
-    body: { barberId, cutId, appointmentDate },
+    body: { barberId, cutId, appointmentDate, paymentMethod },
     fallbackError: "No se pudo reservar el turno",
   });
 

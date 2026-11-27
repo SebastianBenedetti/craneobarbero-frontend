@@ -52,8 +52,8 @@ function StockAdjustmentModal({ product, onClose, onSaved }) {
             <p className="admin-form-hint">Stock actual: {product.stock} → queda en {resulting}</p>
           </div>
           <div className="mb-3">
-            <label htmlFor="adjust-reason" className="admin-form-label">Motivo</label>
-            <input id="adjust-reason" className={INPUT_CLASS} value={reason} onChange={(e) => { setReason(e.target.value); setError(""); }} minLength={3} maxLength={300} required placeholder="Ej.: frasco roto" />
+            <label htmlFor="adjust-reason" className="admin-form-label">Motivo (opcional)</label>
+            <input id="adjust-reason" className={INPUT_CLASS} value={reason} onChange={(e) => { setReason(e.target.value); setError(""); }} maxLength={300} placeholder="Ej.: frasco roto" />
           </div>
           {error && <p className="text-danger small" role="alert">{error}</p>}
           <div className="d-flex gap-2">

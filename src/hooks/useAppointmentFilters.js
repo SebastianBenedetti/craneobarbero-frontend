@@ -1,5 +1,17 @@
 import { useState } from "react";
 
+function upcomingFirst(a, b) {
+  const now = Date.now();
+  const timeA = new Date(a.endDate ?? a.appointmentDate).getTime();
+  const timeB = new Date(b.endDate ?? b.appointmentDate).getTime();
+  const pastA = timeA < now;
+  const pastB = timeB < now;
+  if (pastA !== pastB) return pastA ? 1 : -1;
+  const startA = new Date(a.appointmentDate).getTime();
+  const startB = new Date(b.appointmentDate).getTime();
+  return pastA ? startB - startA : startA - startB;
+}
+
 // hook para manejar filtros y paginado de turnos
 // lo usamos en la agenda del barber y en el panel admin
 // recibe el array de turnos y devuelve todo lo necesario para filtrar y paginar
@@ -59,7 +71,7 @@ function useAppointmentFilters(appointments) {
       if (filterBranchId && String(a.branch?.id) !== String(filterBranchId)) return false;
       return true;
     })
-    .sort((a, b) => new Date(a.appointmentDate) - new Date(b.appointmentDate));
+    .sort(upcomingFirst);
 
   // cuántas páginas hay en total
   const totalPages = Math.ceil(filtered.length / pageSize);

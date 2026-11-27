@@ -4,6 +4,7 @@ import PriceAdjustmentsHistory from "./sections/prices/PriceAdjustmentsHistory";
 import { getPriceAdjustments } from "../../services/prices.services";
 import Toast from "../../components/Toast/Toast";
 import "../../styles/adminDashboard.css";
+import "../../styles/store.css";
 import "../../styles/prices.css";
 
 function AdminPricesPage() {
@@ -21,7 +22,7 @@ function AdminPricesPage() {
   }, [showError]);
 
   useEffect(() => {
-    document.title = " Precios | Panel Admin";
+    document.title = "Precios | Panel Admin";
     loadAdjustments();
   }, [loadAdjustments]);
 
@@ -29,7 +30,7 @@ function AdminPricesPage() {
     <div className="admin-dashboard page-transition">
       <div className="admin-dashboard-header">
         <h1 className="admin-title">Precios</h1>
-        <p className="admin-subtitle">Actualizá los precios de venta por inflación, con vista previa antes de aplicar</p>
+        <p className="admin-subtitle">Subí o bajá los precios de venta (por inflación o a mano), con vista previa antes de aplicar</p>
       </div>
 
       <PriceAdjustmentForm

@@ -45,7 +45,7 @@ function BarberSchedulePage() {
   } = useAppointmentFilters(appointments);
 
   useEffect(() => {
-    document.title = " Mi agenda | Cráneo Barbero";
+    document.title = "Mi agenda | Cráneo Barbero";
   }, []);
 
   // cuando carga la página traemos todos los turnos del barber

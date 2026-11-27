@@ -27,9 +27,10 @@
   padding: 0 17px;
   box-shadow: 0 4px 16px rgba(255, 200, 49, 0.4);
   transition: padding 0.3s ease, box-shadow 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.fab-appointment:hover,
+.fab-appointment.is-revealed,
 .fab-appointment:focus-visible {
   padding: 0 17px 0 20px;
   box-shadow: 0 6px 24px rgba(255, 200, 49, 0.6);
@@ -47,7 +48,7 @@
   transition: max-width 0.3s ease, margin-right 0.3s ease, opacity 0.2s ease 0.1s;
 }
 
-.fab-appointment:hover .fab-label,
+.fab-appointment.is-revealed .fab-label,
 .fab-appointment:focus-visible .fab-label {
   max-width: 140px;
   margin-right: 8px;
@@ -64,33 +65,50 @@
   transition: transform 0.3s ease;
 }
 
-.fab-appointment:hover .ti-scissors {
+.fab-appointment.is-revealed .ti-scissors {
   transform: rotate(-20deg);
+}
+
+@media (hover: hover) {
+  .fab-appointment:hover {
+    padding: 0 17px 0 20px;
+    box-shadow: 0 6px 24px rgba(255, 200, 49, 0.6);
+  }
+
+  .fab-appointment:hover .fab-label {
+    max-width: 140px;
+    margin-right: 8px;
+    opacity: 1;
+  }
+
+  .fab-appointment:hover .ti-scissors {
+    transform: rotate(-20deg);
+  }
 }
 
 @media (max-width: 768px) {
   .fab-appointment,
   .fab-appointment:hover,
-  .fab-appointment:focus-visible {
+  .fab-appointment:focus-visible,
+  .fab-appointment.is-revealed {
     bottom: 1.5rem;
     right: 1.25rem;
     height: 50px;
     min-width: 50px;
     border-radius: 25px;
-    padding: 0 16px 0 18px;
+    padding: 0 12px;
+  }
+
+  .fab-appointment.is-revealed {
+    padding: 0 14px 0 18px;
   }
 
   .fab-label {
-    max-width: none;
-    margin-right: 8px;
-    opacity: 1;
     font-size: 0.9rem;
-    transition: none;
-    pointer-events: auto;
   }
 
   .fab-appointment .ti-scissors {
-    width: 22px;
+    width: 26px;
     font-size: 1.3rem;
   }
 }
