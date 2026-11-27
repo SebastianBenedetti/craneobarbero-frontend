@@ -35,7 +35,7 @@ function AdminPricesPage() {
 
       <PriceAdjustmentForm
         onApplied={(adjustment) => {
-          setToast({ message: `Se actualizaron ${adjustment.itemsCount} precios.`, type: "success" });
+          setToast({ message: adjustment.itemsCount === 1 ? "Se actualizó 1 precio." : `Se actualizaron ${adjustment.itemsCount} precios.`, type: "success" });
           loadAdjustments();
         }}
         onError={showError}
@@ -45,7 +45,7 @@ function AdminPricesPage() {
         adjustments={adjustments}
         loading={loading}
         onReverted={(result) => {
-          setToast({ message: `Ajuste revertido: ${result.restored} precios restaurados.`, type: "success" });
+          setToast({ message: `Ajuste revertido: ${result.restored} ${result.restored === 1 ? "precio restaurado" : "precios restaurados"}.`, type: "success" });
           loadAdjustments();
         }}
         onError={showError}

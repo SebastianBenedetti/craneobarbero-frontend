@@ -28,6 +28,10 @@ function groupByBranch(rows) {
   return [...groups.entries()].map(([branchId, branchRows]) => ({ branchId, rows: branchRows }));
 }
 
+function sortByBranchName(groups, branchesById) {
+  return [...groups].sort((a, b) => (branchesById[a.branchId]?.name ?? "").localeCompare(branchesById[b.branchId]?.name ?? "", "es"));
+}
+
 function HolidayBox({ date, holiday, onChanged, onError }) {
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
@@ -157,7 +161,7 @@ function DayPanel({ date, barbers, branchesById, holiday, refreshKey, onOperate,
       {loading && <p className="agenda-muted">Cargando horarios…</p>}
       {!loading && barbers.length === 0 && <p className="agenda-muted">Elegí al menos una sucursal para ver los horarios.</p>}
 
-      {!loading && groupByBranch(detail.rows).map(({ branchId, rows }, _, groups) => (
+      {!loading && sortByBranchName(groupByBranch(detail.rows), branchesById).map(({ branchId, rows }, _, groups) => (
         <details key={branchId} className="agenda-branch-day" open={groups.length === 1}>
           <summary className="agenda-branch-day-summary">
             <strong>{branchesById[branchId]?.name ?? "Sucursal"}</strong>

@@ -129,12 +129,14 @@ function BarberDashboardPage() {
   const isPast = (date) => new Date(date) < now;
 
   // formatea un dia para el titulo de la agenda (ej: "lunes 12 de junio")
-  const formatDayTitle = (date) =>
-    date.toLocaleDateString("es-AR", {
+  const formatDayTitle = (date) => {
+    const text = date.toLocaleDateString("es-AR", {
       weekday: "long",
       day: "numeric",
       month: "long",
     });
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  };
 
   return (
     <div className="barber-dashboard page-transition">

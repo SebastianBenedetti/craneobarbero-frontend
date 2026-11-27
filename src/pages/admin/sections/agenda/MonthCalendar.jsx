@@ -1,4 +1,5 @@
 import { MONTHS, WEEKDAY_SHORT, monthGrid, todayKey } from "../../../../utils/dates";
+import { plural } from "../../../../utils/format";
 
 function dayState(info, holiday) {
   if (holiday?.isActive) return "holiday";
@@ -53,7 +54,7 @@ function MonthCalendar({ year, month, days, holidays, selected, loading, onSelec
           const label = [
             cell.key,
             holidayName ? `feriado: ${holidayName}` : "",
-            info ? `${info.free} libres, ${info.busy} ocupados, ${info.deleted} eliminados` : "",
+            info ? `${plural(info.free, "libre", "libres")}, ${plural(info.busy, "ocupado", "ocupados")}, ${plural(info.deleted, "eliminado", "eliminados")}` : "",
           ].filter(Boolean).join(", ");
 
           return (
