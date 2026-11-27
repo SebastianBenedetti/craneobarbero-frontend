@@ -179,8 +179,8 @@ function BarberDashboardPage() {
 
       {/* agenda con todos los dias que tienen turnos, uno por fila */}
       <section className="barber-agenda">
-        <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
-          <h2 className="section-title">Agenda de la semana</h2>
+        <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <h2 className="section-title mb-0">Agenda de la semana</h2>
           <button className="btn-agenda-edit" onClick={() => setCreating(true)}>+ Nuevo turno</button>
         </div>
         {futureDays.map((day) => {
