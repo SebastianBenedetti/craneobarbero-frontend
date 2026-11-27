@@ -12,6 +12,22 @@ const HOLIDAY_TYPES = {
 
 const STATE_LABELS = { free: "Libre", busy: "Ocupado", deleted: "Eliminado" };
 
+function countLabel(slots) {
+  const free = slots.filter((s) => s.state === "free").length;
+  const busy = slots.filter((s) => s.state === "busy").length;
+  return `${free} ${free === 1 ? "libre" : "libres"} · ${busy} ${busy === 1 ? "ocupado" : "ocupados"}`;
+}
+
+function groupByBranch(rows) {
+  const groups = new Map();
+  rows.forEach((row) => {
+    const key = row.barber.branchId;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(row);
+  });
+  return [...groups.entries()].map(([branchId, branchRows]) => ({ branchId, rows: branchRows }));
+}
+
 function HolidayBox({ date, holiday, onChanged, onError }) {
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
@@ -141,50 +157,55 @@ function DayPanel({ date, barbers, branchesById, holiday, refreshKey, onOperate,
       {loading && <p className="agenda-muted">Cargando horarios…</p>}
       {!loading && barbers.length === 0 && <p className="agenda-muted">Elegí al menos una sucursal para ver los horarios.</p>}
 
-      {!loading && detail.rows.map(({ barber, slots }) => (
-        <div key={barber.id} className="agenda-barber-day">
-          <div className="agenda-barber-day-header">
-            <strong>{barber.name}</strong>
-            <span className="agenda-muted"> · {branchesById[barber.branchId]?.name ?? ""}</span>
-            <span className="agenda-muted agenda-right">
-              {slots.filter((s) => s.state === "free").length} libres · {slots.filter((s) => s.state === "busy").length} ocupados
-            </span>
-          </div>
-          {slots.length === 0 ? (
-            <p className="agenda-muted agenda-small">Sin horarios este día.</p>
-          ) : (
-            <ul className="agenda-slots">
-              {slots.map((slot) => {
-                const appointment = slot.appointmentId ? detail.appointments[slot.appointmentId] : null;
-                return (
-                  <li key={slot.id} className={`agenda-slot agenda-slot-${slot.state}`}>
-                    <span className="agenda-slot-time">{slot.time}</span>
-                    <span className="agenda-slot-info">
-                      {STATE_LABELS[slot.state] ?? slot.state}
-                      {slot.origin === "manual" && slot.state !== "deleted" && " · agregado a mano"}
-                      {appointment && ` · ${appointment.client?.name ?? appointment.clientName ?? "Cliente"} · ${appointment.cut?.name ?? ""}`}
-                      {slot.state === "deleted" && slot.deleteReason && ` · ${slot.deleteReason === "holiday" ? "feriado" : slot.deleteReason}`}
-                    </span>
-                    {!past && slot.state === "free" && (
-                      <button type="button" className="agenda-slot-btn agenda-slot-btn-danger"
-                        aria-label={`Eliminar ${slot.time} de ${barber.name}`}
-                        onClick={() => onOperate("remove", { dateFrom: date, timeFrom: slot.time, timeTo: addMinutes(slot.time, 30) }, barber)}>
-                        Eliminar
-                      </button>
-                    )}
-                    {!past && slot.state === "deleted" && (
-                      <button type="button" className="agenda-slot-btn"
-                        aria-label={`Volver a agregar ${slot.time} de ${barber.name}`}
-                        onClick={() => onOperate("add", { dateFrom: date, timeFrom: slot.time, timeTo: addMinutes(slot.time, 30) }, barber)}>
-                        Volver a agregar
-                      </button>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
+      {!loading && groupByBranch(detail.rows).map(({ branchId, rows }, _, groups) => (
+        <details key={branchId} className="agenda-branch-day" open={groups.length === 1}>
+          <summary className="agenda-branch-day-summary">
+            <strong>{branchesById[branchId]?.name ?? "Sucursal"}</strong>
+            <span className="agenda-muted agenda-right">{countLabel(rows.flatMap((r) => r.slots))}</span>
+          </summary>
+          {rows.map(({ barber, slots }) => (
+            <details key={barber.id} className="agenda-barber-day">
+              <summary className="agenda-barber-day-header">
+                <strong>{barber.name}</strong>
+                <span className="agenda-muted agenda-right">{countLabel(slots)}</span>
+              </summary>
+              {slots.length === 0 ? (
+                <p className="agenda-muted agenda-small">Sin horarios este día.</p>
+              ) : (
+                <ul className="agenda-slots">
+                  {slots.map((slot) => {
+                    const appointment = slot.appointmentId ? detail.appointments[slot.appointmentId] : null;
+                    return (
+                      <li key={slot.id} className={`agenda-slot agenda-slot-${slot.state}`}>
+                        <span className="agenda-slot-time">{slot.time}</span>
+                        <span className="agenda-slot-info">
+                          {STATE_LABELS[slot.state] ?? slot.state}
+                          {slot.origin === "manual" && slot.state !== "deleted" && " · agregado a mano"}
+                          {appointment && ` · ${appointment.client?.name ?? appointment.clientName ?? "Cliente"} · ${appointment.cut?.name ?? ""}`}
+                          {slot.state === "deleted" && slot.deleteReason && ` · ${slot.deleteReason === "holiday" ? "feriado" : slot.deleteReason}`}
+                        </span>
+                        {!past && slot.state === "free" && (
+                          <button type="button" className="agenda-slot-btn agenda-slot-btn-danger"
+                            aria-label={`Eliminar ${slot.time} de ${barber.name}`}
+                            onClick={() => onOperate("remove", { dateFrom: date, timeFrom: slot.time, timeTo: addMinutes(slot.time, 30) }, barber)}>
+                            Eliminar
+                          </button>
+                        )}
+                        {!past && slot.state === "deleted" && (
+                          <button type="button" className="agenda-slot-btn"
+                            aria-label={`Volver a agregar ${slot.time} de ${barber.name}`}
+                            onClick={() => onOperate("add", { dateFrom: date, timeFrom: slot.time, timeTo: addMinutes(slot.time, 30) }, barber)}>
+                            Volver a agregar
+                          </button>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </details>
+          ))}
+        </details>
       ))}
     </aside>
   );

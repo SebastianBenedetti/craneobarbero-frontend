@@ -279,7 +279,10 @@ span.agenda-day-holiday { color: var(--agenda-holiday); background: none; }
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-  text-transform: capitalize;
+}
+
+.agenda-day-panel-title::first-letter {
+  text-transform: uppercase;
 }
 
 .agenda-close {
@@ -311,18 +314,61 @@ span.agenda-day-holiday { color: var(--agenda-holiday); background: none; }
 
 .agenda-day-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
-.agenda-barber-day {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 10px;
+.agenda-branch-day {
+  border: 1px solid rgba(255, 200, 49, 0.2);
+  border-radius: 10px;
+  padding: 0 12px;
 }
 
+.agenda-branch-day-summary,
 .agenda-barber-day-header {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 4px;
-  margin-bottom: 6px;
+  cursor: pointer;
+  list-style: none;
+  min-height: 44px;
+  align-content: center;
+}
+
+.agenda-branch-day-summary::-webkit-details-marker,
+.agenda-barber-day-header::-webkit-details-marker {
+  display: none;
+}
+
+.agenda-branch-day-summary::before,
+.agenda-barber-day-header::before {
+  content: "▸";
+  color: var(--accent-primary);
+  width: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.agenda-branch-day[open] > .agenda-branch-day-summary::before,
+.agenda-barber-day[open] > .agenda-barber-day-header::before {
+  transform: rotate(90deg);
+}
+
+.agenda-branch-day-summary {
+  font-size: 1rem;
+}
+
+.agenda-branch-day[open] {
+  padding-bottom: 8px;
+}
+
+.agenda-barber-day {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.agenda-barber-day-header {
   font-size: 0.95rem;
+}
+
+.agenda-barber-day[open] > .agenda-slots,
+.agenda-barber-day[open] > p {
+  margin-bottom: 10px;
 }
 
 .agenda-slots {
