@@ -1,6 +1,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router";
+import PasswordInput from "../PasswordInput/PasswordInput";
 import { loginService } from "./auth.services";
 
 const Login = ({ onLogin, onCancel, context, subtitle = "Iniciá sesión para confirmar tu turno" }) => {
@@ -64,7 +65,7 @@ const Login = ({ onLogin, onCancel, context, subtitle = "Iniciá sesión para co
   };
 
   useEffect(() => {
-    document.title = " Iniciar sesión | Cráneo Barbero";
+    document.title = "Iniciar sesión | Cráneo Barbero";
   }, []);
 
   return (
@@ -92,8 +93,7 @@ const Login = ({ onLogin, onCancel, context, subtitle = "Iniciá sesión para co
       </div>
 
       <div className="mb-4">
-        <input
-          type="password"
+        <PasswordInput
           required
           ref={passwordRef}
           placeholder="Ingresar contraseña"
