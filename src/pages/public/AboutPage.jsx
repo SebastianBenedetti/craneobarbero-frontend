@@ -12,7 +12,7 @@ function AboutPage() {
   const branches = useBranches();
 
   useEffect(() => {
-    document.title = " Nosotros | Cráneo Barbero";
+    document.title = "Nosotros | Cráneo Barbero";
   }, []);
 
   return (

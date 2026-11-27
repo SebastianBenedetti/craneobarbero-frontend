@@ -21,7 +21,7 @@ function AdminPricesPage() {
   }, [showError]);
 
   useEffect(() => {
-    document.title = " Precios | Panel Admin";
+    document.title = "Precios | Panel Admin";
     loadAdjustments();
   }, [loadAdjustments]);
 

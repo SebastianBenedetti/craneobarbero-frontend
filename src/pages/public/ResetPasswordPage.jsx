@@ -14,7 +14,7 @@ function ResetPasswordPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    document.title = " Nueva contraseña | Cráneo Barbero";
+    document.title = "Nueva contraseña | Cráneo Barbero";
   }, []);
 
   const handleSubmit = async (e) => {

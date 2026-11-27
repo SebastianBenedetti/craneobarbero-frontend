@@ -37,7 +37,7 @@ function MyAppointmentsPage() {
   const [reviewing, setReviewing] = useState(null);
 
   useEffect(() => {
-    document.title = " Mis turnos | Cráneo Barbero";
+    document.title = "Mis turnos | Cráneo Barbero";
   }, []);
 
   // funcion reutilizable para traer los turnos del servidor

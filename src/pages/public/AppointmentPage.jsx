@@ -57,7 +57,7 @@ function AppointmentPage() {
   }); // filtro los barberos segun la sucursal seleccionada antes
 
   useEffect(() => {
-    document.title = " Sacar turno | Cráneo Barbero";
+    document.title = "Sacar turno | Cráneo Barbero";
   }, []);
 
   return (

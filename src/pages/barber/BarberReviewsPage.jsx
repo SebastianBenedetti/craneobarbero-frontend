@@ -5,7 +5,7 @@ import "../../styles/adminDashboard.css";
 
 function BarberReviewsPage() {
   useEffect(() => {
-    document.title = " Mis reseñas | Panel Barbero";
+    document.title = "Mis reseñas | Panel Barbero";
   }, []);
 
   return (

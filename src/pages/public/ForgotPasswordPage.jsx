@@ -10,7 +10,7 @@ function ForgotPasswordPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    document.title = " Recuperar contraseña | Cráneo Barbero";
+    document.title = "Recuperar contraseña | Cráneo Barbero";
   }, []);
 
   const handleSubmit = async (e) => {

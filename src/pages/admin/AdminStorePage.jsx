@@ -35,7 +35,7 @@ function AdminStorePage() {
   const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
-    document.title = " Tienda y stock | Panel Admin";
+    document.title = "Tienda y stock | Panel Admin";
   }, []);
 
   const loadCategories = useCallback(() => {

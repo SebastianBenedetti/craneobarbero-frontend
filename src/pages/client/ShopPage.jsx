@@ -32,7 +32,7 @@ function ShopPage() {
   const [added, setAdded] = useState(null);
 
   useEffect(() => {
-    document.title = " Tienda | Cráneo Barbero";
+    document.title = "Tienda | Cráneo Barbero";
   }, []);
 
   useEffect(() => {

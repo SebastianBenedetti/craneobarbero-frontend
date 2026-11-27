@@ -4,7 +4,7 @@ import "../../styles/adminDashboard.css";
 
 function AdminAgendaPage() {
   useEffect(() => {
-    document.title = " Agenda | Panel Admin";
+    document.title = "Agenda | Panel Admin";
   }, []);
 
   return (

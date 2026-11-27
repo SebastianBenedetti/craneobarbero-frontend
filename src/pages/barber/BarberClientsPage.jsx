@@ -11,7 +11,7 @@ function BarberClientsPage() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    document.title = " Mis clientes | Panel Barbero";
+    document.title = "Mis clientes | Panel Barbero";
     getMyClients().then(setClients).catch((err) => setError(err.message));
   }, []);
 

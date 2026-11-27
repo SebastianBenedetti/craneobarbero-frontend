@@ -60,7 +60,7 @@ function AdminReportsPage() {
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
-    document.title = " Reportes | Panel Admin";
+    document.title = "Reportes | Panel Admin";
     apiRequest("/branches?includeInactive=true", { fallbackError: "No se pudieron cargar las sucursales" })
       .then(setBranches)
       .catch(() => setBranches([]));
