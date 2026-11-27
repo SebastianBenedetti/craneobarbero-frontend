@@ -15,7 +15,7 @@ import {
 } from "../../services/reports.services";
 import { currentMonthPeriod } from "../../utils/dates";
 import { shareSummaryImage } from "../../utils/shareImage";
-import { appointmentStatusNames, formatMoney, formatPercent, formatTurns } from "../../utils/format";
+import { appointmentStatusNames, formatMoney, formatPercent, formatTurns, plural } from "../../utils/format";
 import "../../styles/adminDashboard.css";
 import "../../styles/reports.css";
 
@@ -178,10 +178,10 @@ function AdminReportsPage() {
           <div className="report-stats">
             <StatCard label="Ingreso total" value={formatMoney(summary.totalIncome)} hint="Turnos y productos" />
             <StatCard label="Ingresos por turnos" value={formatMoney(appointments.income)}
-              hint={`${appointments.incomeCount} turnos (${appointments.lateCancellationsCharged} cancelaciones tardías cobradas)`} />
+              hint={`${plural(appointments.incomeCount, "turno", "turnos")} (${plural(appointments.lateCancellationsCharged, "cancelación tardía cobrada", "cancelaciones tardías cobradas")})`} />
             <StatCard label="Pagados por adelantado" value={formatMoney(appointments.prepaid.amount)}
-              hint={`${appointments.prepaid.count} turnos futuros, todavía no cuentan`} />
-            <StatCard label="Ventas de productos" value={formatMoney(products.income)} hint={`${products.orders} pedidos · ${products.units} unidades`} />
+              hint={`${plural(appointments.prepaid.count, "turno futuro", "turnos futuros")}, todavía no cuentan`} />
+            <StatCard label="Ventas de productos" value={formatMoney(products.income)} hint={`${plural(products.orders, "pedido", "pedidos")} · ${plural(products.units, "unidad", "unidades")}`} />
             <StatCard label="Ganancia de productos" value={formatMoney(products.profit)} hint={`Costo ${formatMoney(products.cost)}`} />
             <StatCard label="Turnos completados" value={appointments.completed}
               hint={`${appointments.byStatus.cancelled} cancelados · ${appointments.byStatus.expired} expirados`} />
