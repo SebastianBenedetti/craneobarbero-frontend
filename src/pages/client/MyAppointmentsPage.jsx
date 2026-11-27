@@ -129,7 +129,7 @@ function MyAppointmentsPage() {
         <div className="card bg-dark border-secondary p-4 text-center">
           <p className="text-secondary mb-3">No tenés turnos activos.</p>
           <button
-            className="btn btn-warning text-dark"
+            className="btn btn-warning text-dark align-self-center px-4"
             onClick={() => navigate("/appointment")}
           >
             Sacar un turno
